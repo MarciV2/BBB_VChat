@@ -8,11 +8,10 @@
 		<version>2.4.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>de.dhbw-heidenheim.informatik.assfalg</groupId>
-	<artifactId>personspring</artifactId>
+	<groupId>de.dhbw-heidenheim.informatik.ChatServer</groupId>
+	<artifactId>chatspring</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>personspring</name>
-	<description>Demo project mit der Klasse Person mit Spring Boot</description>
+	<name>ChatServer</name>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
@@ -21,6 +20,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+		<dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-hateoas</artifactId>

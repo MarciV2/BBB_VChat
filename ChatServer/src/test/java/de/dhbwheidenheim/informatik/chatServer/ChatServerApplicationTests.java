@@ -1,10 +1,10 @@
-package de.dhbwheidenheim.informatik.assfalg.personspring;
+package de.dhbwheidenheim.informatik.chatServer;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PersonspringApplicationTests {
+class ChatServerApplicationTests {
 
 	@Test
 	void contextLoads() {
