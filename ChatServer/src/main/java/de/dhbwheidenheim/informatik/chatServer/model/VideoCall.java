@@ -4,23 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.dhbwheidenheim.informatik.chatServer.model.enums.CallState;
-import de.dhbwheidenheim.informatik.chatServer.model.enums.CallType;
 import de.dhbwheidenheim.informatik.chatServer.model.enums.RoomState;
 
 public class VideoCall {
 
 	private ChatRoom chatRoom;
-	private CallType callType;
+	private boolean privateCall;
 	private CallState callState;
 	private Person organizer; 
 	private List<Person> invitees;
 	private List<Person> attendees;
 
 
-	public VideoCall(Person organizer, ChatRoom chatRoom ,CallType callType) {
+	public VideoCall(Person organizer, ChatRoom chatRoom ,boolean privateCall) {
 		this.organizer=organizer;
 		this.chatRoom=chatRoom;
-		this.callType=callType;
+		this.privateCall=privateCall;
 		this.callState=CallState.IN_PROGRESS;
 		invitees=new ArrayList<Person>();
 		invitees.add(organizer);
@@ -39,8 +38,8 @@ public class VideoCall {
 		return attendees;
 	}
 		
-	public CallType getCallType() {
-		return callType;
+	public boolean isCallPrivate() {
+		return privateCall;
 	}
 
 	public CallState getCallState() {
@@ -65,11 +64,13 @@ public class VideoCall {
 	public boolean personJoins(Person joiner) {
 		if(callState!=CallState.OVER) {
 			//Bei BEENDET sollen keine Personen mehr beitreten können
-			if(callType==CallType.PRIVATE) {
+			if(privateCall) {
 				if(!invitees.contains(joiner)) {
 					//Bei PRIVAT sollen nicht eingeladene Personen nicht beitreten können
 					return false;
 				}
+			}else {
+				invitees.add(joiner);
 			}
 			
 			attendees.add(joiner);
@@ -83,7 +84,7 @@ public class VideoCall {
 	 * Event, wenn Person den Raum verlässt. Wenn letzte Person geht, wird der Anruf beendet und der Raum wieder freigegeben
 	 * @param leaver verlassende Person
 	 */
-	public void leaveRoom(Person leaver) {
+	public void personLeaves(Person leaver) {
 		attendees.remove(leaver);
 		if(attendees.size()==0) {
 			callState=CallState.OVER;

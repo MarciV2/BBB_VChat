@@ -1,7 +1,5 @@
 package de.dhbwheidenheim.informatik.chatServer.model.enums;
 
-public enum CallType {
-PUBLIC, PRIVATE;
+public enum PersonState {
+ONLINE,OFFLINE,BUSY,DONOTDISTURB;
 }
-
-
