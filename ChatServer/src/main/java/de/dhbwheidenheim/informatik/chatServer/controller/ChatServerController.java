@@ -36,16 +36,13 @@ public class ChatServerController {
 		if(personList==null)personList=new ArrayList<Person>();
 		else for(Person p :personList) p.setState(PersonState.OFFLINE);
 
-
 		callsList=read("./calls.txt");
 		if(callsList==null)	callsList=new ArrayList<VideoCall>();
 		else for(VideoCall vc:callsList) vc.setCallState(CallState.OVER);
 
-
 		roomsList=read("./rooms.txt");
 		if(roomsList==null)	roomsList=new ArrayList<ChatRoom>();
 		else for(ChatRoom cr: roomsList)cr.setState(RoomState.FREE);
-
 
 	}
 
@@ -93,34 +90,34 @@ public class ChatServerController {
 	 * @param firstName Vorname
 	 * @param lastName Nachname
 	 * @param password Passwort
-	 * @return ID des Nutzers
+	 * @return username oder "" wenn name nicht verfügbar
 	 */
 	@GetMapping("/registerPerson")
-	public @ResponseBody long registerPerson( @RequestParam String username, @RequestParam String password) {
-		//get nexst id
-		long id=(long) personList.size();
+	public @ResponseBody String registerPerson( @RequestParam String username, @RequestParam String password) {
+		//username auf verfügbarkeit prüfen
+		for(Person p:personList) if(p.getUsername().equals(username)) return "";
 		personList.add(new Person(username, password));
 		saveData();
-		return id;
+		return username;
 	}
 
 	/**
 	 * Prüft die Korrektheit des Passworts
 	 * @param userID Vorname
 	 * @param password Passwort
-	 * @return ID des Nutzers, wenn Anmeldung erfolgreich war
+	 * @return true, wenn Passwort korrekt ist, sonst false
 	 */
 	@GetMapping("/login")
 	public @ResponseBody boolean login(@RequestParam String username, @RequestParam String password) {
 		//Person identifizieren
-		for(Person p:personList) {
-			if(p.getUsername().equals(username)) {
+		for(Person p:personList) 
+			if(p.getUsername().equals(username)) 
 				if(p.getPassword().equals(password)) {
 					p.setState(PersonState.ONLINE);
 					return true;
 				}
-			}
-		}
+
+
 		return false;
 
 	}
