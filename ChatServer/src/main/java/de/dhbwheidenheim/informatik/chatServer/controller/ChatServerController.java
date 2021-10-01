@@ -1,17 +1,16 @@
 package de.dhbwheidenheim.informatik.chatServer.controller;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import org.springframework.core.serializer.Deserializer;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,39 +27,39 @@ import de.dhbwheidenheim.informatik.chatServer.model.enums.RoomState;
 @RestController
 @RequestMapping("")
 public class ChatServerController {
-	static Map<Long,Person> personList;
-	static Map<Long,VideoCall>callsList;
-	static Map<Long,ChatRoom>roomsList;
+	static List<Person> personList;
+	static List<VideoCall>callsList;
+	static List<ChatRoom>roomsList;
 
 	public static void init() {
-		personList=new HashMap<Long,Person>();
+		personList=new ArrayList<Person>();
 		personList=read("./persons.txt");
-		for(Person p :personList.values()) {
+		for(Person p :personList) {
 			p.setState(PersonState.OFFLINE);
 		}
-		
-		callsList=new HashMap<Long,VideoCall>();
+
+		callsList=new ArrayList<VideoCall>();
 		callsList=read("./calls.txt");
-		for(VideoCall vc:callsList.values()) {
+		for(VideoCall vc:callsList) {
 			vc.setCallState(CallState.OVER);
 		}
 
-		roomsList=new HashMap<Long,ChatRoom>();
+		roomsList=new ArrayList<ChatRoom>();
 		roomsList=read("./rooms.txt");
-		for(ChatRoom cr: roomsList.values()) {
+		for(ChatRoom cr: roomsList) {
 			cr.setState(RoomState.FREE);
 		}
 
 	}
 
-	
+
 	public static void saveData() {
 		save(personList,"./persons.txt");
 		save(callsList,"./calls.txt");
 		save(roomsList,"./rooms.txt");
 	}
-	
-	public static void save(Map list, String filename) {
+
+	public static void save(List list, String filename) {
 		try {
 			FileOutputStream fos=new FileOutputStream(filename);
 			ObjectOutputStream oos=new ObjectOutputStream(fos);
@@ -74,13 +73,13 @@ public class ChatServerController {
 			e.printStackTrace();
 		}
 	}
-	
 
-	public static Map read(String filename) {
+
+	public static List read(String filename) {
 		try {
 			FileInputStream fis=new FileInputStream(filename);
 			ObjectInputStream ois=new ObjectInputStream(fis);
-			Map list=(Map) ois.readObject();
+			List list=(List) ois.readObject();
 			fis.close();
 			ois.close();
 			return list;
@@ -90,7 +89,7 @@ public class ChatServerController {
 			return null;
 		}
 	}
-	
+
 
 	/**
 	 * Registriert eine neue Person
@@ -100,10 +99,10 @@ public class ChatServerController {
 	 * @return ID des Nutzers
 	 */
 	@GetMapping("/registerPerson")
-	public @ResponseBody long registerPerson(@RequestParam String firstName, @RequestParam String lastName, @RequestParam String password) {
+	public @ResponseBody long registerPerson( @RequestParam String username, @RequestParam String password) {
 		//get nexst id
 		long id=(long) personList.size();
-		personList.put(id,new Person(firstName, lastName, password));
+		personList.add(new Person(username, password));
 		saveData();
 		return id;
 	}
@@ -115,53 +114,64 @@ public class ChatServerController {
 	 * @return ID des Nutzers, wenn Anmeldung erfolgreich war
 	 */
 	@GetMapping("/login")
-	public @ResponseBody String login(@RequestParam String userID, @RequestParam String password) {
+	public @ResponseBody boolean login(@RequestParam String username, @RequestParam String password) {
 		//Person identifizieren
-		Person p=personList.get(userID);
-		if(p.getPassword().equals(password)) {
-			p.setState(PersonState.ONLINE);
-			return userID;
+		for(Person p:personList) {
+			if(p.getUsername().equals(username)) {
+				if(p.getPassword().equals(password)) {
+					p.setState(PersonState.ONLINE);
+					return true;
+				}
+			}
 		}
-		else return "";
+		return false;
 
 	}
 
 	/**
 	 * Ändert den Status eines Benutzer
-	 * @param userID UserID des Benutzers
+	 * @param username Benutzername
 	 * @param state Status, den der Nutzer setzen möchte
 	 * @return true wenn erfolgreich, false wenn Person nicht gefunden wurde
 	 */
 	@GetMapping("/setPersonState")
-	public @ResponseBody boolean setPersonState(@RequestParam String userID, @RequestParam String state) {
-		//Person identifizieren
-		Person p=personList.get(Long.parseLong(userID));
-		if(p!=null) {
-			p.setState(PersonState.valueOf(state.toUpperCase()));
-			return true;
-		}return false;
+	public @ResponseBody boolean setPersonState(@RequestParam String username, @RequestParam String state) {
+
+		for(Person p:personList) {
+			if(p.getUsername().equals(username)) {				
+				p.setState(PersonState.valueOf(state.toUpperCase()));
+				return true;
+			}
+		}
+		return false;
 	}
 
 
 	/**
 	 * Erstellt einen neuen Anruf
 	 * @param CallType Ob privat oder public
-	 * @param organizerID Person, die den Anruf startet
+	 * @param organizername Username der Person, die den Anruf startet
 	 * @return CallID, null wenn Organisator nicht gefunden wurde oder kein freier Raum verfügbar ist
 	 */
 	@GetMapping("/newCall")
-	public @ResponseBody Object newCall(@RequestParam String callType, @RequestParam String organizerID) {
+	public @ResponseBody Object newCall(@RequestParam String callType, @RequestParam String organizername) {
 		//Organisator identifizieren
-		Person org=personList.get(Long.parseLong(organizerID));
+		Person org = null;
+		for(Person p:personList) {
+			if(p.getUsername().equals(organizername)) {				
+				org=p;
+				break;
+			}
+		}
 		if(org!=null) {
 			//Prüfen, ob ein freier Raum verfügbar ist
-			for(ChatRoom cr:roomsList.values()) {
+			for(ChatRoom cr:roomsList) {
 				if(cr.getState()==RoomState.FREE) {
 					boolean privateCall=callType.equalsIgnoreCase("private")? true : false;
-					VideoCall nCall=new VideoCall(org, cr,privateCall);
+					VideoCall nCall=new VideoCall(callsList.size(),org, cr,privateCall);
 					cr.setState(RoomState.OCCUPIED);
 					long id=(long) callsList.size();
-					callsList.put(id,nCall);
+					callsList.add(nCall);
 					System.out.println(id);
 					saveData();
 					return id;
@@ -174,25 +184,30 @@ public class ChatServerController {
 
 	/**
 	 * Nutzer verlässt Anruf
-	 * @param leaverID Verlassende Person
+	 * @param username Verlassende Person
 	 * @param callID zu verlassender Anruf
 	 * @return true wenn erfolgreich, false wenn Person oder Anruf nicht gefunden wurden.
 	 */
 	@GetMapping("/leaveCall")
-	public @ResponseBody boolean leaveCall(@RequestParam String leaverID, @RequestParam String callID) {
+	public @ResponseBody boolean leaveCall(@RequestParam String username, @RequestParam String callID) {
 		//Person identifizieren
-		Person p=personList.get(Long.parseLong(leaverID));
-		if(p!=null) {
-			//Anruf identifizieren
-			VideoCall call=callsList.get(Long.parseLong(callID));
-			if(call!=null) {
-				call.personLeaves(p);
-				//Status der Person aktualisieren
-				updatePersonState(p);
-				return true;
-			}
+		Person user=null;
+		for(Person p:personList) {
+			if(p.getUsername().equals(username)) {
 
-		}	
+				//Anruf identifizieren
+				for(VideoCall call:callsList) {
+					if(call.getId()==Integer.parseInt(callID)) {
+						call.personLeaves(p);
+						//Status der Person aktualisieren
+						updatePersonState(p);
+						return true;
+					}
+				}
+				return false;
+			}
+		}
+
 		return false;
 	}
 
@@ -203,7 +218,7 @@ public class ChatServerController {
 	public void updatePersonState(Person p) {
 		if(p.getState().equals(PersonState.BUSY)) {
 			boolean personInCall=false;
-			for(VideoCall vc : callsList.values()) {
+			for(VideoCall vc : callsList) {
 				if(vc.getAttendees().contains(p)) personInCall=true;
 			}
 			if(!personInCall) p.setState(PersonState.ONLINE);
@@ -213,24 +228,22 @@ public class ChatServerController {
 	/**
 	 * Person tritt einem bestehenden Anruf bei
 	 * @param callID AnrufID
-	 * @param joinerID Person, die beitritt
+	 * @param username Person, die beitritt
 	 * @return Raum-URL, wenn erfolgreich, null wenn Anruf oder beitretende Person nicht gefunden wurden, Person nicht eingeladen wurde oder anruf bereits vorbei ist
 	 */
 	@GetMapping("/joinCall")
-	public @ResponseBody String joinCall(@RequestParam String callID, @RequestParam String joinerID) {
+	public @ResponseBody String joinCall(@RequestParam String callID, @RequestParam String username) {
 		//person identifizieren
-		Person joiner=personList.get(Long.parseLong(joinerID));
-		if(joiner!=null) {
-			//Anruf identifizieren
-			VideoCall call=callsList.get(Long.parseLong(callID));
-			if(call!=null) {
-				//personJoins enthält abfrage bezüglich der berechtigung
-				if(call.personJoins(joiner)) {
-					joiner.setState(PersonState.BUSY);
-					return call.getChatRoom().getRoomURL().toString();
-				}
-			}
-		}
+		for(Person p:personList) 
+			if(p.getUsername().equals(username)) 
+				//Anruf identifizieren
+				for(VideoCall vc:callsList) 
+					if(vc.getId()==Integer.parseInt(callID)) 
+						//personJoins enthält abfrage bezüglich der berechtigung
+						if(vc.personJoins(p)) {
+							p.setState(PersonState.BUSY);
+							return vc.getChatRoom().getRoomURL().toString();
+						}
 		return null;
 	}
 
@@ -241,18 +254,15 @@ public class ChatServerController {
 	 * @return false, wenn Anruf oder Person nicht gefunden oder Anruf bereits vorbei oder Person nicht Online ist
 	 */
 	@GetMapping("/inviteUserToCall")
-	public @ResponseBody boolean inviteUserToCall(@RequestParam String callID, @RequestParam String inviteeID) {
+	public @ResponseBody boolean inviteUserToCall(@RequestParam String callID, @RequestParam String inviteeUsername) {
 		//person identifizieren
-		Person invitee=personList.get(Long.parseLong(inviteeID));
-		if(invitee!=null) {
-			//Prüfen, ob Person online ist (andernfalls abbrechen)
-			if(!invitee.getState().equals(PersonState.ONLINE)) {return false;}
-			//Anruf identifizieren
-			VideoCall call=callsList.get(Long.parseLong(callID));
-			if(call!=null) {
-				return call.invitePerson(invitee);
-			}
-		}
+		for(Person p: personList) 
+			if(p.getUsername().equals(inviteeUsername)&&p.getState().equals(PersonState.ONLINE))
+				for(VideoCall call:callsList)
+					if(call.getId()==Integer.parseInt(callID)) //callState wird in invitePerson geprüft
+						return call.invitePerson(p);
+					else break;	
+			else break;	
 		return false;
 	}
 
@@ -264,14 +274,11 @@ public class ChatServerController {
 	@GetMapping("/newRoom")
 	public @ResponseBody Object newRoom(@RequestParam String roomURL) {
 		try {
-			ChatRoom nRoom=new ChatRoom(new URL(roomURL));
+			ChatRoom nRoom=new ChatRoom(roomsList.size(),new URL(roomURL));
 
-			//Prüfen, dass Raum nicht bereits existiert
-			if(roomsList.containsValue(nRoom)) return false;
-			long id=(long) roomsList.size();
-			roomsList.put(id, nRoom);
+			roomsList.add(nRoom);
 			saveData();
-			return id;
+			return nRoom.getId();
 
 		} catch (MalformedURLException e) {
 			//Fehler bei ungültiger URL abfangen
@@ -287,31 +294,32 @@ public class ChatServerController {
 	 * @return null wenn kein anruf oder nutzer nicht existiert, sonst der Anruf
 	 */
 	@RequestMapping("/amICalled")
-	public VideoCall amICalled(@RequestParam String userID) {
+	public VideoCall amICalled(@RequestParam String username) {
 		//anfragende Person identifizieren
-		Person asker=personList.get(Long.parseLong(userID));
-		if(asker==null) return null;
-		for(VideoCall vc:callsList.values()) {
-			//Nur aktive oder wartende Anrufe prüfen
-			if(vc.getCallState()!=CallState.OVER)
-				//Teilnehmer auf frangenden durchsuchen
-				if(vc.getInvitees().contains(asker)) return vc;
-		}
+		for(Person p: personList)
+			if(p.getUsername().equals(username))
+				for(VideoCall vc:callsList) {
+					//Nur aktive oder wartende Anrufe prüfen
+					if(vc.getCallState()!=CallState.OVER)
+						//Teilnehmer auf frangenden durchsuchen
+						if(vc.getInvitees().contains(p)) return vc;
+				}
+		
 		return null;
 	}
 
 	@RequestMapping("/listPersons")
-	public Map<Long,Person> getPersons() {
+	public List<Person> getPersons() {
 		return personList;
 	}
 
 	@RequestMapping("/listRooms")
-	public Map<Long,ChatRoom> getRooms() {
+	public List<ChatRoom> getRooms() {
 		return roomsList;
 	}
 
 	@RequestMapping("/listCalls")
-	public Map<Long,VideoCall> getCalls() {
+	public List<VideoCall> getCalls() {
 		return callsList;
 	}
 

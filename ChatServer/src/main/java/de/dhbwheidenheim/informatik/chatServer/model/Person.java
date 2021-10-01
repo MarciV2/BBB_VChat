@@ -7,15 +7,13 @@ import de.dhbwheidenheim.informatik.chatServer.model.enums.PersonState;
 public class Person implements Serializable{
 
 	private static final long serialVersionUID = 1L;
-	private String firstName;
-	private String lastName;
+	private String username;
 	private String password;
 	private PersonState state;
 	
 	
-	public Person(String firstName, String lastName, String password) {
-		this.firstName = firstName;
-		this.lastName = lastName;
+	public Person(String username, String password) {
+		this.username = username;
 		this.password=password;
 		this.state=PersonState.ONLINE;
 	}
@@ -23,16 +21,12 @@ public class Person implements Serializable{
 	@Override
 	public String toString() {
 		 return String.format(
-			        "Person[firstName='%s', lastName='%s', state='%s']",
-			        firstName, lastName,state);
+			        "Person[username='%s', state='%s']",
+			         username,state);
 	}
 
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
+	public String getUsername() {
+		return username;
 	}
 	
 	public String getPassword() {

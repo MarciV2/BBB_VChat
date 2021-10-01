@@ -8,6 +8,7 @@ import de.dhbwheidenheim.informatik.chatServer.model.enums.RoomState;
 
 public class VideoCall {
 
+	private int id;
 	private ChatRoom chatRoom;
 	private boolean privateCall;
 	private CallState callState;
@@ -16,7 +17,8 @@ public class VideoCall {
 	private List<Person> attendees;
 
 
-	public VideoCall(Person organizer, ChatRoom chatRoom ,boolean privateCall) {
+	public VideoCall(int id,Person organizer, ChatRoom chatRoom ,boolean privateCall) {
+		this.id=id;
 		this.organizer=organizer;
 		this.chatRoom=chatRoom;
 		this.privateCall=privateCall;
@@ -25,7 +27,9 @@ public class VideoCall {
 		invitees.add(organizer);
 		attendees=new ArrayList<Person>();
 	}
-	
+	public int getId() {
+		return id;
+	}
 	public Person getOrganizer() {
 		return organizer;
 	}

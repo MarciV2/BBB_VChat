@@ -6,15 +6,19 @@ import de.dhbwheidenheim.informatik.chatServer.model.enums.RoomState;
 
 
 public class ChatRoom {
-		
+		private int id;
 	private URL roomURL;
 	private RoomState state;
 
-	public ChatRoom(URL roomURL) {
+	public ChatRoom(int id,URL roomURL) {
+		this.id=id;
 		this.roomURL=roomURL;
 		state=RoomState.FREE;
 	}
 	
+	public int getId() {
+		return id;
+	}
 	public URL getRoomURL() {
 		return roomURL;
 	}
