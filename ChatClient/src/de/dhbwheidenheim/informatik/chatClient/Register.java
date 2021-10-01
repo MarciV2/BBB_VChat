@@ -37,7 +37,6 @@ import java.awt.FlowLayout;
 
 public class Register extends JDialog {
 	private JTextField textField;
-	private JTextField textField_1;
 	private JPasswordField passwordField;
 
 	public Register() {
@@ -48,7 +47,7 @@ public class Register extends JDialog {
 		getContentPane().setLayout(null);
 
 		JPanel panel = new JPanel();
-		panel.setBounds(10, 11, 192, 132);
+		panel.setBounds(10, 11, 192, 112);
 		getContentPane().add(panel);
 		panel.setLayout(null);
 
@@ -57,20 +56,17 @@ public class Register extends JDialog {
 		lblNewLabel.setBounds(0, 0, 111, 17);
 		panel.add(lblNewLabel);
 
-		JLabel lblNewLabel_1 = new JLabel("Vorname:");
-		lblNewLabel_1.setBounds(0, 28, 58, 14);
+		JLabel lblNewLabel_1 = new JLabel("Benutzername:");
+		lblNewLabel_1.setBounds(0, 28, 75, 14);
 		panel.add(lblNewLabel_1);
 
-		JLabel lblNewLabel_2 = new JLabel("Name:");
-		lblNewLabel_2.setBounds(0, 53, 46, 14);
-		panel.add(lblNewLabel_2);
 
 		JLabel lblNewLabel_3 = new JLabel("Passwort:");
-		lblNewLabel_3.setBounds(0, 78, 58, 14);
+		lblNewLabel_3.setBounds(0, 56, 58, 14);
 		panel.add(lblNewLabel_3);
 
 		textField = new JTextField();
-		textField.setBounds(70, 25, 110, 20);
+		textField.setBounds(84, 25, 96, 20);
 		panel.add(textField);
 		textField.setColumns(10);
 
@@ -79,8 +75,7 @@ public class Register extends JDialog {
 			public void actionPerformed(ActionEvent e) 
 			{
 				//Registrierungsrequest
-				String vn = textField.getText();
-				String n = textField_1.getText();
+				String username = textField.getText();
 				String p=new String(passwordField.getPassword());
 
 				//Passwort verschlüsseln
@@ -100,14 +95,14 @@ public class Register extends JDialog {
 				}
 
 
-				if(vn.isEmpty()||n.isEmpty()||p.isEmpty())
+				if(username.isEmpty()||p.isEmpty())
 					System.out.println("Bitte die Felder ausfüllen");
 				else
 				{
-					if(vn.length()>15||n.length()>15||p.length()>15)
+					if(username.length()>15||p.length()>15)
 						System.out.println("Die maximale Eingabelänge ist 16 Zeichen");
 					else {
-						String Anfrage = "http://localhost:8080/registerPerson?firstName="+vn+"&lastName="+n+"&password="+generatedPassword;
+						String Anfrage = "http://localhost:8080/registerPerson?username="+username+"&password="+generatedPassword;
 						System.out.println(Anfrage);
 						URL url;
 						try {
@@ -123,19 +118,16 @@ public class Register extends JDialog {
 								}
 								if(response.isEmpty()) System.out.println("Fehler bei der Antwort");
 								else {
-									System.out.println("Erfolgreich registriert, ihre ID ist:"+response.toString());
+									System.out.println("Erfolgreich registriert, ihr Benutzername ist:"+response.toString());
 									self.setVisible(false);
 								}
 							} catch (UnsupportedEncodingException e1) {
-								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							} catch (IOException e1) {
-								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}
 							con.disconnect();
 						} catch (IOException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 
@@ -143,16 +135,11 @@ public class Register extends JDialog {
 				}
 			}
 		});
-		btnNewButton.setBounds(0, 103, 180, 23);
+		btnNewButton.setBounds(0, 81, 180, 23);
 		panel.add(btnNewButton);
 
-		textField_1 = new JTextField();
-		textField_1.setBounds(70, 50, 110, 20);
-		panel.add(textField_1);
-		textField_1.setColumns(10);
-
 		passwordField = new JPasswordField();
-		passwordField.setBounds(70, 75, 110, 20);
+		passwordField.setBounds(84, 53, 96, 20);
 		panel.add(passwordField);
 	}
 }

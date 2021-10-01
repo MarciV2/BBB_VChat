@@ -32,23 +32,20 @@ public class ChatServerController {
 	static List<ChatRoom>roomsList;
 
 	public static void init() {
-		personList=new ArrayList<Person>();
 		personList=read("./persons.txt");
-		for(Person p :personList) {
-			p.setState(PersonState.OFFLINE);
-		}
+		if(personList==null)personList=new ArrayList<Person>();
+		else for(Person p :personList) p.setState(PersonState.OFFLINE);
 
-		callsList=new ArrayList<VideoCall>();
+
 		callsList=read("./calls.txt");
-		for(VideoCall vc:callsList) {
-			vc.setCallState(CallState.OVER);
-		}
+		if(callsList==null)	callsList=new ArrayList<VideoCall>();
+		else for(VideoCall vc:callsList) vc.setCallState(CallState.OVER);
 
-		roomsList=new ArrayList<ChatRoom>();
+
 		roomsList=read("./rooms.txt");
-		for(ChatRoom cr: roomsList) {
-			cr.setState(RoomState.FREE);
-		}
+		if(roomsList==null)	roomsList=new ArrayList<ChatRoom>();
+		else for(ChatRoom cr: roomsList)cr.setState(RoomState.FREE);
+
 
 	}
 
@@ -304,7 +301,7 @@ public class ChatServerController {
 						//Teilnehmer auf frangenden durchsuchen
 						if(vc.getInvitees().contains(p)) return vc;
 				}
-		
+
 		return null;
 	}
 
