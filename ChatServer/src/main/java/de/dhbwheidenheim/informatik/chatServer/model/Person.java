@@ -1,12 +1,15 @@
 package de.dhbwheidenheim.informatik.chatServer.model;
 
+import java.io.Serializable;
+
 import de.dhbwheidenheim.informatik.chatServer.model.enums.PersonState;
 
-public class Person {
+public class Person implements Serializable{
 
+	private static final long serialVersionUID = 1L;
 	private String firstName;
 	private String lastName;
-	private String password;	//TODO Soll verschlüsselt werden 
+	private String password;
 	private PersonState state;
 	
 	

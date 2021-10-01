@@ -1,10 +1,17 @@
 package de.dhbwheidenheim.informatik.chatServer.controller;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.core.serializer.Deserializer;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,11 +34,63 @@ public class ChatServerController {
 
 	public static void init() {
 		personList=new HashMap<Long,Person>();
+		personList=read("./persons.txt");
+		for(Person p :personList.values()) {
+			p.setState(PersonState.OFFLINE);
+		}
+		
 		callsList=new HashMap<Long,VideoCall>();
+		callsList=read("./calls.txt");
+		for(VideoCall vc:callsList.values()) {
+			vc.setCallState(CallState.OVER);
+		}
+
 		roomsList=new HashMap<Long,ChatRoom>();
+		roomsList=read("./rooms.txt");
+		for(ChatRoom cr: roomsList.values()) {
+			cr.setState(RoomState.FREE);
+		}
+
 	}
 
+	
+	public static void saveData() {
+		save(personList,"./persons.txt");
+		save(callsList,"./calls.txt");
+		save(roomsList,"./rooms.txt");
+	}
+	
+	public static void save(Map list, String filename) {
+		try {
+			FileOutputStream fos=new FileOutputStream(filename);
+			ObjectOutputStream oos=new ObjectOutputStream(fos);
+			oos.writeObject(list);
+			oos.flush();
+			oos.close();
+			fos.flush();
+			fos.close();
+			System.out.println("Daten gespeichert!");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 
+	public static Map read(String filename) {
+		try {
+			FileInputStream fis=new FileInputStream(filename);
+			ObjectInputStream ois=new ObjectInputStream(fis);
+			Map list=(Map) ois.readObject();
+			fis.close();
+			ois.close();
+			return list;
+
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 
 	/**
 	 * Registriert eine neue Person
@@ -45,8 +104,28 @@ public class ChatServerController {
 		//get nexst id
 		long id=(long) personList.size();
 		personList.put(id,new Person(firstName, lastName, password));
+		saveData();
 		return id;
 	}
+
+	/**
+	 * Prüft die Korrektheit des Passworts
+	 * @param userID Vorname
+	 * @param password Passwort
+	 * @return ID des Nutzers, wenn Anmeldung erfolgreich war
+	 */
+	@GetMapping("/login")
+	public @ResponseBody String login(@RequestParam String userID, @RequestParam String password) {
+		//Person identifizieren
+		Person p=personList.get(userID);
+		if(p.getPassword().equals(password)) {
+			p.setState(PersonState.ONLINE);
+			return userID;
+		}
+		else return "";
+
+	}
+
 	/**
 	 * Ändert den Status eines Benutzer
 	 * @param userID UserID des Benutzers
@@ -84,6 +163,7 @@ public class ChatServerController {
 					long id=(long) callsList.size();
 					callsList.put(id,nCall);
 					System.out.println(id);
+					saveData();
 					return id;
 				}
 			} System.out.println("kein freier Raum");
@@ -190,6 +270,7 @@ public class ChatServerController {
 			if(roomsList.containsValue(nRoom)) return false;
 			long id=(long) roomsList.size();
 			roomsList.put(id, nRoom);
+			saveData();
 			return id;
 
 		} catch (MalformedURLException e) {
@@ -228,12 +309,12 @@ public class ChatServerController {
 	public Map<Long,ChatRoom> getRooms() {
 		return roomsList;
 	}
-	
+
 	@RequestMapping("/listCalls")
 	public Map<Long,VideoCall> getCalls() {
 		return callsList;
 	}
-	
+
 
 	@RequestMapping("/")
 	public String home() {
@@ -269,43 +350,43 @@ public class ChatServerController {
 				+ "User-ID: <input name=\"userID\" type=\"input\"/><br>"
 				+ "<input type=\"submit\"/><br>" 
 				+ "</form>"
-				
+
 				+ "<h2>Personen auflisten:</h2>" 
 				+ "<form action=\"/listPersons\" Method=\"GET\">"
 				+ "<input type=\"submit\"/><br>" 
 				+ "</form>"
-				
+
 				+ "<h2>Räume auflisten:</h2>" 
 				+ "<form action=\"/listRooms\" Method=\"GET\">"
 				+ "<input type=\"submit\"/><br>" 
 				+ "</form>"
-				
+
 				+ "<h2>Anrufe auflisten:</h2>" 
 				+ "<form action=\"/listCalls\" Method=\"GET\">"
 				+ "<input type=\"submit\"/><br>" 
 				+ "</form>"
-				
+
 				+ "<h2>Anruf beitreten:</h2>" 
 				+ "<form action=\"/joinCall\" Method=\"GET\">"
 				+ "Anruf-ID: <input name=\"callID\" type=\"input\"/><br>" 
 				+ "User-ID: <input name=\"joinerID\" type=\"input\"/><br>"
 				+ "<input type=\"submit\"/><br>" 
 				+ "</form>"
-				
+
 				+ "<h2>Person zu Anruf einladen:</h2>" 
 				+ "<form action=\"/inviteUserToCall\" Method=\"GET\">"
 				+ "Anruf-ID: <input name=\"callID\" type=\"input\"/><br>" 
 				+ "User-ID: <input name=\"inviteeID\" type=\"input\"/><br>"
 				+ "<input type=\"submit\"/><br>" 
 				+ "</form>"
-				
+
 				+ "<h2>Anruf verlassen:</h2>" 
 				+ "<form action=\"/leaveCall\" Method=\"GET\">"
 				+ "Anruf-ID: <input name=\"callID\" type=\"input\"/><br>" 
 				+ "User-ID: <input name=\"leaverID\" type=\"input\"/><br>"
 				+ "<input type=\"submit\"/><br>" 
 				+ "</form>"
-				
+
 				+ "<h2>Status ändern:</h2>" 
 				+ "<form action=\"/setPersonState\" Method=\"GET\">"
 				+ "User-ID: <input name=\"userID\" type=\"input\"/><br>" 
@@ -317,7 +398,7 @@ public class ChatServerController {
 				+ "  <label for=\"doNotDisturb\">Nicht Stören</label><br>"
 				+ "<input type=\"submit\"/><br>" 
 				+ "</form>"
-				
+
 				+ "</html>\n");
 	}
 

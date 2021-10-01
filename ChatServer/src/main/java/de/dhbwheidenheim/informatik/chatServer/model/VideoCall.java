@@ -49,6 +49,11 @@ public class VideoCall {
 	public ChatRoom getChatRoom() {
 		return chatRoom;
 	}
+	
+	public void setCallState(CallState state) {
+		this.callState=state;
+	}
+	
 
 	/**
 	 * Lädt einzelne Person dem Anruf ein
