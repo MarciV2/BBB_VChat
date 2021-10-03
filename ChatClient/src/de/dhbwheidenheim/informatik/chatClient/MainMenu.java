@@ -9,6 +9,7 @@ import java.net.ProtocolException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,13 +38,19 @@ import javax.swing.JTree;
 import javax.swing.JScrollPane;
 import javax.swing.JRadioButton;
 import javax.swing.tree.DefaultTreeModel;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class MainMenu extends JDialog {
 	private JTextField textField;
+	private String username;
+	private IncomingCallPopup incomingCallPopup;
 	
-	public MainMenu(String id) {
-		String user = id;
+	public MainMenu(String username) {
+		this.username = username;
 		String userDaten=null;
 		//HTTP Request der userDaten setzt
 		
@@ -146,15 +153,69 @@ public class MainMenu extends JDialog {
 		        	if(self.isVisible())
 		        	{
 		        	treeSchreiben();
+//		        	amICalled();	//TODO wieder aktivieren
 		        	//Abfrage der Personenliste und speichern in jtree
 		            System.out.println("10 seconds passed");}
 		        }
 		    },
 		    0,      // run first occurrence immediately
 		    10000);  // run every three seconds
+	
+	amICalled();
 	}
 	void treeSchreiben()
 	{
 		
+	}
+	
+	void amICalled() {
+		JDialog self=this;
+		String Anfrage = "http://localhost:8080/amICalled?username="+username;
+		System.out.println(Anfrage);
+		URL url;
+		try {
+			url = new URL(Anfrage);
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("GET");
+			try(BufferedReader br = new BufferedReader(
+					new InputStreamReader(con.getInputStream(), "utf-8"))) {
+				StringBuilder response = new StringBuilder();
+				String responseLine = null;
+				while ((responseLine = br.readLine()) != null) {
+					response.append(responseLine.trim());
+				}
+				if(response.isEmpty()) System.out.println("Fehler bei der Antwort");
+				else {
+					System.out.println("AmiCalled-Antwort: "+response.toString());
+					//Nur popup anzeigen, wenn noch nicht angezeigt
+					if(incomingCallPopup==null || !incomingCallPopup.isVisible()) {
+						JSONObject call=new JSONObject(response.toString());
+						JSONObject room=call.getJSONObject("chatRoom");
+						URI roomURI=new URI(room.getString("roomURL"));
+						boolean isPrivate=(boolean) call.getBoolean("callPrivate");
+						ArrayList<String> invitees=new ArrayList<>();
+						for(Object s: call.getJSONArray("invitees")) {
+							JSONObject o=new JSONObject(String.valueOf(s));
+							invitees.add(o.getString("username"));
+						}
+						ArrayList<String> attendees=new ArrayList<>();
+						for(Object s: call.getJSONArray("attendees")) {
+							JSONObject o=new JSONObject(String.valueOf(s));
+							attendees.add(o.getString("username"));
+						}
+						String organizer=call.getJSONObject("organizer").getString("username");
+//						invitees.remove(organizer);
+//						invitees.remove(username);
+						incomingCallPopup=new IncomingCallPopup(roomURI,organizer,isPrivate,invitees,attendees);
+					}
+					incomingCallPopup.setVisible(true);
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			} 
+			con.disconnect();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	}
 }

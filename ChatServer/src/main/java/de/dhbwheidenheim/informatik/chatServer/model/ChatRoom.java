@@ -1,11 +1,13 @@
 package de.dhbwheidenheim.informatik.chatServer.model;
 
+import java.io.Serializable;
 import java.net.URL;
 
 import de.dhbwheidenheim.informatik.chatServer.model.enums.RoomState;
 
 
-public class ChatRoom {
+public class ChatRoom implements Serializable{
+	private static final long serialVersionUID = 1L;
 		private int id;
 	private URL roomURL;
 	private RoomState state;

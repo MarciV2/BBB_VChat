@@ -19,12 +19,12 @@ public class MainGui extends JFrame {
 	public MainGui() {
 		
 		
-		JButton btnNewButton = new JButton("openPopup");
+		JButton btnNewButton = new JButton("openMenuAsTest");
 		btnNewButton.setBounds(347, 0, 87, 261);
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				IncomingCallPopup pu=new IncomingCallPopup();
-				pu.setVisible(true);
+				MainMenu m= new MainMenu("test");
+				m.setVisible(true);
 			}
 		});
 		getContentPane().setLayout(null);
