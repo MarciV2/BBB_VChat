@@ -15,7 +15,7 @@ public class Person implements Serializable{
 	public Person(String username, String password) {
 		this.username = username;
 		this.password=password;
-		this.state=PersonState.ONLINE;
+		this.state=PersonState.OFFLINE;
 	}
 	
 	@Override
