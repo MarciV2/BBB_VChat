@@ -95,7 +95,7 @@ public class ChatServerController {
 	@GetMapping("/registerPerson")
 	public @ResponseBody String registerPerson( @RequestParam String username, @RequestParam String password) {
 		//username auf verfügbarkeit prüfen
-		for(Person p:personList) if(p.getUsername().equals(username)) return "";
+		for(Person p:personList) if(p.getUsername().equals(username)) return "Fehler der Username ist bereits vergeben";
 		personList.add(new Person(username, password));
 		saveData();
 		return username;
