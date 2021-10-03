@@ -104,7 +104,6 @@ public class Register extends JDialog {
 				}
 						//Url zum Aufruf mit Eingaben befüllen
 						String Anfrage = "http://localhost:8080/registerPerson?username="+username+"&password="+generatedPassword;
-						
 						URL url;
 						try {
 							//HTTPRequest Erstellung
