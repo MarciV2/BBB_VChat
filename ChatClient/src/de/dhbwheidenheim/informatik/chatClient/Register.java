@@ -135,7 +135,6 @@ public class Register extends JDialog {
 							} catch (IOException e1) {
 								System.out.println("Fehler bei HTTP Request Spring Boot Server muss gestartet sein");
 							}
-							
 							}
 							
 						 catch (IOException e1)  {
