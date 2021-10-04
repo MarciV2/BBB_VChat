@@ -83,6 +83,12 @@ public class Register extends JDialog {
 					System.out.println("Bitte die Felder ausfüllen");
 				else
 				{
+					if(username.contains("\"")||username.contains(":")||username.contains(",")||username.contains("{")||username.contains("}")||username.contains("[")||username.contains("]"))
+						System.out.println("Sonderzeichen wie :,\"{}[] sind für den usernamen nicht erlaubt");
+					else {
+						if(username.equals("username"))
+							System.out.println("Der Benutzername darf nicht username sein");
+						else {
 				if(username.length()>15||p.length()>15)
 						System.out.println("Die maximale Eingabelänge ist 16 Zeichen");
 					else {
@@ -143,7 +149,7 @@ public class Register extends JDialog {
 						}
 						
 					}	
-				}
+				}}}
 			}
 		});
 
