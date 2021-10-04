@@ -23,6 +23,8 @@ import de.dhbwheidenheim.informatik.chatServer.model.VideoCall;
 import de.dhbwheidenheim.informatik.chatServer.model.enums.CallState;
 import de.dhbwheidenheim.informatik.chatServer.model.enums.PersonState;
 import de.dhbwheidenheim.informatik.chatServer.model.enums.RoomState;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
 @RestController
 @RequestMapping("")
@@ -303,8 +305,15 @@ public class ChatServerController {
 	}
 
 	@RequestMapping("/listPersons")
-	public List<Person> getPersons() {
-		return personList;
+	public String getPersons() {
+		JSONArray persons=new JSONArray();
+		for(Person p:personList) {
+			JSONObject obj=new JSONObject();
+			obj.appendField("username", p.getUsername());
+			obj.appendField("state", p.getState());
+			persons.add(obj);
+		}
+		return persons.toJSONString();
 	}
 
 	@RequestMapping("/listRooms")
