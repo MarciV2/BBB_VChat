@@ -304,6 +304,10 @@ public class ChatServerController {
 		return null;
 	}
 
+	/**
+	 * Liste über alle Personen	
+	 * @return JSON-Array mit allen Benutzernamen und jeweiligem Status
+	 */
 	@RequestMapping("/listPersons")
 	public String getPersons() {
 		JSONArray persons=new JSONArray();
