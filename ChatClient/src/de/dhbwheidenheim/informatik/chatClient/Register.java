@@ -3,6 +3,7 @@ package de.dhbwheidenheim.informatik.chatClient;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -40,44 +41,52 @@ public class Register extends JDialog {
 	private JPasswordField passwordField;
 
 	public Register() {
+		//Grundeinstellungen des Windows
 		Register self=this;
 		self.setAlwaysOnTop(true);
-		self.setSize(220, 185);
+		self.setSize(220, 165);
 		self.setResizable(false);
-		getContentPane().setLayout(null);
+		setLocationRelativeTo(null);
+	
 
 		JPanel panel = new JPanel();
 		panel.setBounds(10, 11, 192, 112);
 		getContentPane().add(panel);
-		panel.setLayout(null);
 
 		JLabel lblNewLabel = new JLabel("Registrierung:");
+		lblNewLabel.setBounds(10, 11, 111, 17);
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblNewLabel.setBounds(0, 0, 111, 17);
-		panel.add(lblNewLabel);
 
 		JLabel lblNewLabel_1 = new JLabel("Benutzername:");
-		lblNewLabel_1.setBounds(0, 28, 75, 14);
-		panel.add(lblNewLabel_1);
+		lblNewLabel_1.setBounds(10, 39, 75, 14);
 
 
 		JLabel lblNewLabel_3 = new JLabel("Passwort:");
-		lblNewLabel_3.setBounds(0, 56, 58, 14);
-		panel.add(lblNewLabel_3);
+		lblNewLabel_3.setBounds(10, 67, 58, 14);
 
 		textField = new JTextField();
-		textField.setBounds(84, 25, 96, 20);
-		panel.add(textField);
+		textField.setBounds(94, 36, 96, 20);
 		textField.setColumns(10);
 
 		JButton btnNewButton = new JButton("Registrieren");
+		btnNewButton.setBounds(10, 92, 180, 23);
+		//Button zur Registrierung geklickt
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) 
 			{
 				//Registrierungsrequest
 				String username = textField.getText();
 				String p=new String(passwordField.getPassword());
-
+				
+				//Grundvorgaben der Felder
+				if(username.isEmpty()||p.isEmpty())
+					System.out.println("Bitte die Felder ausfüllen");
+				else
+				{
+				if(username.length()>15||p.length()>15)
+						System.out.println("Die maximale Eingabelänge ist 16 Zeichen");
+					else {
+						
 				//Passwort verschlüsseln
 				String generatedPassword = null;
 				try {
@@ -93,22 +102,16 @@ public class Register extends JDialog {
 				} catch (NoSuchAlgorithmException ex) {
 					ex.printStackTrace();
 				}
-
-
-				if(username.isEmpty()||p.isEmpty())
-					System.out.println("Bitte die Felder ausfüllen");
-				else
-				{
-					if(username.length()>15||p.length()>15)
-						System.out.println("Die maximale Eingabelänge ist 16 Zeichen");
-					else {
+						//Url zum Aufruf mit Eingaben befüllen
 						String Anfrage = "http://localhost:8080/registerPerson?username="+username+"&password="+generatedPassword;
-						System.out.println(Anfrage);
 						URL url;
 						try {
+							//HTTPRequest Erstellung
+							
 							url = new URL(Anfrage);
 							HttpURLConnection con = (HttpURLConnection) url.openConnection();
 							con.setRequestMethod("GET");
+							//Abfrage der Rückgabe des Requests
 							try(BufferedReader br = new BufferedReader(
 									new InputStreamReader(con.getInputStream(), "utf-8"))) {
 								StringBuilder response = new StringBuilder();
@@ -118,28 +121,40 @@ public class Register extends JDialog {
 								}
 								if(response.isEmpty()) System.out.println("Fehler bei der Antwort");
 								else {
+									if(response.toString().equals("Fehler der Username ist bereits vergeben"))
+										System.out.println(response);
+									else
 									System.out.println("Erfolgreich registriert, ihr Benutzername ist:"+response.toString());
 									self.setVisible(false);
 								}
+								con.disconnect();
 							} catch (UnsupportedEncodingException e1) {
+								
 								e1.printStackTrace();
 							} catch (IOException e1) {
-								e1.printStackTrace();
+								
+								System.out.println("Fehler bei HTTP Request Spring Boot Server muss gestartet sein");
 							}
-							con.disconnect();
-						} catch (IOException e1) {
-							e1.printStackTrace();
+							}
+							
+						 catch (IOException e1)  {
+							
+							//e1.printStackTrace();
 						}
-
+						
 					}	
 				}
 			}
 		});
-		btnNewButton.setBounds(0, 81, 180, 23);
-		panel.add(btnNewButton);
 
 		passwordField = new JPasswordField();
-		passwordField.setBounds(84, 53, 96, 20);
+		passwordField.setBounds(94, 64, 96, 20);
+		panel.setLayout(null);
+		panel.add(lblNewLabel);
+		panel.add(lblNewLabel_1);
+		panel.add(lblNewLabel_3);
+		panel.add(textField);
+		panel.add(btnNewButton);
 		panel.add(passwordField);
 	}
 }
