@@ -353,7 +353,7 @@ public class MainMenu extends JFrame {
 		}
 	}
 
-	void amICalled() {
+	void amICalled() { 
 		JFrame self = this;
 		String Anfrage = "http://localhost:8080/amICalled?username=" + username;
 		System.out.println(Anfrage);
