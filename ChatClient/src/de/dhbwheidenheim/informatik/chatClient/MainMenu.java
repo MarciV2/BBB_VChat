@@ -53,7 +53,7 @@ import javax.swing.event.ChangeEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 
-public class MainMenu extends JDialog {
+public class MainMenu extends JFrame {
 	private JTextField textField;
 	private String username;
 	private IncomingCallPopup incomingCallPopup;
@@ -354,7 +354,7 @@ public class MainMenu extends JDialog {
 	}
 
 	void amICalled() {
-		JDialog self = this;
+		JFrame self = this;
 		String Anfrage = "http://localhost:8080/amICalled?username=" + username;
 		System.out.println(Anfrage);
 		URL url;
