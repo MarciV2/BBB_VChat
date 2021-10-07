@@ -232,7 +232,10 @@ public class MainMenu extends JDialog {
 							node_4 = new DefaultMutableTreeNode("Offline");
 							DefaultMutableTreeNode node_5;
 							node_5 = new DefaultMutableTreeNode("Gesamt");
-
+							DefaultMutableTreeNode node_6;
+							node_6 = new DefaultMutableTreeNode("Keine anderen Nutzer regisitriert");	
+							
+							
 							int n1 = 0, n2 = 0, n3 = 0, n4 = 0;
 
 							for (int i = 0; i < ja.length(); i++) {
@@ -241,34 +244,38 @@ public class MainMenu extends JDialog {
 							}
 
 							l.sort(null);
+							if(l.get(1) != null)
+							{
 							for (int i = 0; i < ja.length(); i++) {
+								if(l.get(i).contains(username)==false)
+								 {
 								if (l.get(i).contains("ONLINE")) {
 									n1++;
-									System.out.println(l.get(i));
+									
 									node_1.add(new DefaultMutableTreeNode(l.get(i)));
 
 								}
 								if (l.get(i).contains("BUSY")) {
 									n2++;
-									System.out.println(l.get(i));
+									
 									node_2.add(new DefaultMutableTreeNode(l.get(i)));
 
 								}
 								if (l.get(i).contains("DONOTDISTURB")) {
 									n3++;
-									System.out.println(l.get(i));
+									
 									node_3.add(new DefaultMutableTreeNode(l.get(i)));
 
 								}
 								if (l.get(i).contains("OFFLINE")) {
 									n4++;
-									System.out.println(l.get(i));
+									
 									node_4.add(new DefaultMutableTreeNode(l.get(i)));
 
 								}
 
 								node_5.add(new DefaultMutableTreeNode(l.get(i)));
-							}
+							}}
 							//Beim öffnen mit windoweditor wird getContentPane(). vor dem add(node_n); gesetzt dies löschen führt sonst zu Problemen
 							if (n1 > 0)
 								add(node_1);
@@ -280,7 +287,12 @@ public class MainMenu extends JDialog {
 								add(node_4);
 							add(node_5);
 						}
-					}));
+							else add(node_6);
+							
+							System.out.println("Benutzerliste wurde aktualisiert")	;
+								
+							
+							}}));
 				}
 				con.disconnect();
 			} catch (UnsupportedEncodingException e1) {
