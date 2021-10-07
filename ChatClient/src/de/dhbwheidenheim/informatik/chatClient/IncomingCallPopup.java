@@ -1,6 +1,5 @@
 package de.dhbwheidenheim.informatik.chatClient;
 
-import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -17,8 +16,6 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 
 import de.dhbwheidenheim.informatik.chatClient.PopupElements.CustomTreeCellRenderer;
 import de.dhbwheidenheim.informatik.chatClient.PopupElements.CustomTreeNode;
@@ -91,6 +88,7 @@ public class IncomingCallPopup extends JDialog {
 
 
 
+		
 
 		CustomTreeNode top=new CustomTreeNode(details_icon,"Details");
 		if(isPrivate)top.add(new CustomTreeNode(minus_icon,"Privater Anruf"));

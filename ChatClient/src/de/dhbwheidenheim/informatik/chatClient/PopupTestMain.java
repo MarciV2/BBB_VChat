@@ -7,7 +7,6 @@ import java.util.ArrayList;
 public class PopupTestMain {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		IncomingCallPopup popup;
 		try {
 			ArrayList<String> list=new ArrayList<String>();
