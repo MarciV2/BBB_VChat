@@ -36,6 +36,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.SwingConstants;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.FlowLayout;
 import javax.swing.JTree;
@@ -60,9 +61,13 @@ public class MainMenu extends JFrame {
 	private JTree tree = new JTree();
 
 	public MainMenu(String username) {
+		
 		this.username = username;
-
+		
 		MainMenu self = this;
+		URL iconURL = getClass().getResource("/resources/BigBlueButton_icon.svg.png");
+		ImageIcon icon = new ImageIcon(iconURL);
+		this.setIconImage(icon.getImage());
 		self.setAlwaysOnTop(true);
 		self.setSize(1000, 1000);
 		self.setResizable(false);
@@ -77,7 +82,7 @@ public class MainMenu extends JFrame {
 
 						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 					statusÄndern("OFFLINE");
-					System.exit(0);
+					self.setVisible(false);
 				}
 			}
 		});
