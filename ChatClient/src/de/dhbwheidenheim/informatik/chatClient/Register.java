@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextPane;
 import java.awt.event.ActionListener;
@@ -32,11 +33,12 @@ import javax.swing.JPanel;
 import javax.swing.BoxLayout;
 import javax.swing.SwingConstants;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.FlowLayout;
 
-public class Register extends JDialog {
+public class Register extends JFrame {
 	private JTextField textField;
 	private JPasswordField passwordField;
 
@@ -47,7 +49,9 @@ public class Register extends JDialog {
 		self.setSize(220, 165);
 		self.setResizable(false);
 		setLocationRelativeTo(null);
-	
+		URL iconURL = getClass().getResource("/resources/BigBlueButton_icon.svg.png");
+		ImageIcon icon = new ImageIcon(iconURL);
+		self.setIconImage(icon.getImage());
 
 		JPanel panel = new JPanel();
 		panel.setBounds(10, 11, 192, 112);

@@ -1,6 +1,7 @@
 package de.dhbwheidenheim.informatik.chatClient;
 
 import javax.swing.JFrame;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
@@ -27,7 +28,9 @@ public class MainGui extends JFrame {
 	static String username;
 	public MainGui() {
 		getContentPane().setLayout(null);
-		
+		URL iconURL = getClass().getResource("/resources/BigBlueButton_icon.svg.png");
+		ImageIcon icon = new ImageIcon(iconURL);
+		this.setIconImage(icon.getImage());
 		JLabel lblNewLabel = new JLabel("Anmelden:");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblNewLabel.setBounds(10, 11, 87, 14);

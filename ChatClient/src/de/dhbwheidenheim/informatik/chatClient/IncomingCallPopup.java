@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -30,7 +31,11 @@ public class IncomingCallPopup extends JDialog {
 
 		this.setAlwaysOnTop(true);
 		getContentPane().setLayout(null);
-
+		
+		URL iconURL = getClass().getResource("/resources/BigBlueButton_icon.svg.png");
+		ImageIcon icon = new ImageIcon(iconURL);
+		this.setIconImage(icon.getImage());
+		
 		JLabel lblNewLabel = new JLabel("Eingehender Anruf von ");
 		lblNewLabel.setBounds(10, 0, 140, 30);
 		getContentPane().add(lblNewLabel);
