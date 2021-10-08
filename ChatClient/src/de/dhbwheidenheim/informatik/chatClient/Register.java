@@ -87,8 +87,8 @@ public class Register extends JFrame {
 					System.out.println("Bitte die Felder ausfüllen");
 				else
 				{
-					if(username.contains("\"")||username.contains(":")||username.contains(",")||username.contains("{")||username.contains("}")||username.contains("[")||username.contains("]"))
-						System.out.println("Sonderzeichen wie :,\"{}[] sind für den usernamen nicht erlaubt");
+					if(username.contains("\"")||username.contains(":")||username.contains(",")||username.contains("{")||username.contains("}")||username.contains("[")||username.contains("]")||username.contains(" "))
+						System.out.println("Sonderzeichen wie (Leerzeichen :,\"{}[]) sind für den usernamen nicht erlaubt");
 					else {
 						if(username.equals("username"))
 							System.out.println("Der Benutzername darf nicht username sein");
