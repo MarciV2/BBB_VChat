@@ -1,6 +1,7 @@
 package de.dhbwheidenheim.informatik.chatClient;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.net.HttpURLConnection;
@@ -65,8 +66,10 @@ public class MainMenu extends JFrame {
 	private JTextField textField;
 	private String username;
 	private IncomingCallPopup incomingCallPopup;
-	// private JTree tree = new JTree();
-
+	private JTree tree;
+	private CustomTreeNode top;
+//	 private JTree tree = new JTree();
+	private JScrollPane scrollPane;
 	public MainMenu(String username) {
 		// Speichern des eigenen usernames
 		this.username = username;
@@ -117,6 +120,14 @@ public class MainMenu extends JFrame {
 		textField.setText(username);
 
 		JButton btnNewButton = new JButton("Ausgew\u00E4hlte Nutzer anrufen");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String selectedusername="";
+				
+				System.out.println(tree.getSelectionCount());
+				
+			}
+		});
 		btnNewButton.setBounds(225, 29, 204, 23);
 		panel.add(btnNewButton);
 
@@ -181,7 +192,21 @@ public class MainMenu extends JFrame {
 		gruppe.add(rdbtnNewRadioButton_1);
 		gruppe.add(rdbtnNewRadioButton_2);
 		gruppe.add(rdbtnNewRadioButton_3);
-
+		
+		
+		
+		top = new CustomTreeNode(new ImageIcon(
+				IncomingCallPopup.class.getResource("/resources/details.png"), "Benutzer"));
+		tree=new JTree(top);
+		scrollPane = new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setBounds(10, 31, 205, 184);
+		getContentPane().add(scrollPane);
+		// Tree renderer um Bilder darzustellen
+		tree.setCellRenderer(new CustomTreeCellRenderer());
+		
+		
+		
 		JButton btnNewButton_2 = new JButton("Benutzerliste aktualisieren");
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -197,7 +222,7 @@ public class MainMenu extends JFrame {
 			public void run() {
 				if (self.isVisible()) {
 					// Benutzerliste wird aktualisiert
-					treeSchreiben();
+//					treeSchreiben();	//TODO definitiv wieder aktivieren!
 
 //		        	amICalled();	//TODO wieder aktivieren
 
@@ -245,7 +270,8 @@ public class MainMenu extends JFrame {
 					ImageIcon details_icon = new ImageIcon(
 							IncomingCallPopup.class.getResource("/resources/details.png"));
 					// Erstellen der Nodes
-					CustomTreeNode top = new CustomTreeNode(details_icon, "Benutzer");
+					top=new CustomTreeNode(new ImageIcon(
+							IncomingCallPopup.class.getResource("/resources/details.png"), "Benutzer"));
 					CustomTreeNode onlineNode = new CustomTreeNode(persons_icon, "Online");
 					CustomTreeNode busyNode = new CustomTreeNode(persons_icon, "Beschäftigt");
 					CustomTreeNode dontdisturbNode = new CustomTreeNode(persons_icon, "Nicht stören");
@@ -268,7 +294,7 @@ public class MainMenu extends JFrame {
 					l.sort(null);
 
 					// Liste leer?
-					if (l.get(0) != null) {
+					if (!l.get(0).equals(null)) {
 						// Für alle Listenelemente einmal abfragen
 						for (int i = 0; i < l.size(); i++) {
 							s = l.get(i).toString();
@@ -315,20 +341,15 @@ public class MainMenu extends JFrame {
 					}
 
 					// Tree erstellen
-					JTree tree = new JTree(top);
+//					 tree = new JTree(top);
+					((DefaultTreeModel) tree.getModel()).setRoot(top);
 
 					// Tree aufklappen
 					for (int i = 0; i < tree.getRowCount(); i++) {
 						tree.expandRow(i);
 					}
-
 					// Scrollpane erstellen und tree mitgeben
-					JScrollPane scrollPane = new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-							JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-					scrollPane.setBounds(10, 31, 205, 184);
-					getContentPane().add(scrollPane);
-					// Tree renderer um Bilder darzustellen
-					tree.setCellRenderer(new CustomTreeCellRenderer());
+					
 					System.out.println("Benutzerliste für:" + username + " wurde aktualisiert");
 
 				}
