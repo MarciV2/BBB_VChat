@@ -28,6 +28,8 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
+import java.awt.Rectangle;
+
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JPanel;
@@ -43,10 +45,15 @@ import javax.swing.JTree;
 import javax.swing.JScrollPane;
 import javax.swing.JRadioButton;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import de.dhbwheidenheim.informatik.chatClient.PopupElements.CustomTreeCellRenderer;
+import de.dhbwheidenheim.informatik.chatClient.PopupElements.CustomTreeNode;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.event.ChangeListener;
@@ -58,27 +65,32 @@ public class MainMenu extends JFrame {
 	private JTextField textField;
 	private String username;
 	private IncomingCallPopup incomingCallPopup;
-	private JTree tree = new JTree();
+	// private JTree tree = new JTree();
 
 	public MainMenu(String username) {
-		
+		// Speichern des eigenen usernames
 		this.username = username;
-		
+
 		MainMenu self = this;
+		// Windowicon setzen
 		URL iconURL = getClass().getResource("/resources/BigBlueButton_icon.svg.png");
 		ImageIcon icon = new ImageIcon(iconURL);
 		this.setIconImage(icon.getImage());
+		// Grundeinstellung für Fenster wie Größe festlegen und Veränderungen verbieten
 		self.setAlwaysOnTop(true);
 		self.setSize(1000, 1000);
 		self.setResizable(false);
 		getContentPane().setLayout(null);
+		// Fenster in der Mitte zentriert öffnen
 		setLocationRelativeTo(null);
-		self.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+		// Abfangen des Schließen Buttons um Status auf Offline setzen zu können
 		self.addWindowListener(new java.awt.event.WindowAdapter() {
 
 			@Override
 			public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-				if (JOptionPane.showConfirmDialog(self, "Are you sure you want to close this window?", "Close Window?",
+				if (JOptionPane.showConfirmDialog(self, "Sind sie sich sicher das sie das Fenster schließen wollen? ",
+						"Fenster schließen?",
 
 						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 					statusÄndern("OFFLINE");
@@ -86,6 +98,7 @@ public class MainMenu extends JFrame {
 				}
 			}
 		});
+		// Gui Elemente hinzufügen
 		JPanel panel = new JPanel();
 		panel.setBounds(10, 11, 439, 309);
 		getContentPane().add(panel);
@@ -103,12 +116,6 @@ public class MainMenu extends JFrame {
 		textField.setColumns(10);
 		textField.setText(username);
 
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 31, 205, 184);
-		panel.add(scrollPane);
-
-		scrollPane.setViewportView(tree);
-
 		JButton btnNewButton = new JButton("Ausgew\u00E4hlte Nutzer anrufen");
 		btnNewButton.setBounds(225, 29, 204, 23);
 		panel.add(btnNewButton);
@@ -116,7 +123,8 @@ public class MainMenu extends JFrame {
 		JLabel lblNewLabel_1 = new JLabel("Status setzen:");
 		lblNewLabel_1.setBounds(235, 59, 103, 14);
 		panel.add(lblNewLabel_1);
-
+		// Wenn sich Status eines Radiobuttons ändert und der Zustand selected ist wird
+		// die dazugehörige Status setzen Funktion geöffnet
 		JRadioButton rdbtnNewRadioButton = new JRadioButton("Online");
 		rdbtnNewRadioButton.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
@@ -167,13 +175,13 @@ public class MainMenu extends JFrame {
 		});
 		btnNewButton_1.setBounds(225, 192, 204, 23);
 		panel.add(btnNewButton_1);
-
+		// Zusammengruppieren der radiobuttons
 		ButtonGroup gruppe = new ButtonGroup();
 		gruppe.add(rdbtnNewRadioButton);
 		gruppe.add(rdbtnNewRadioButton_1);
 		gruppe.add(rdbtnNewRadioButton_2);
 		gruppe.add(rdbtnNewRadioButton_3);
-		
+
 		JButton btnNewButton_2 = new JButton("Benutzerliste aktualisieren");
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -182,25 +190,30 @@ public class MainMenu extends JFrame {
 		});
 		btnNewButton_2.setBounds(10, 226, 205, 23);
 		panel.add(btnNewButton_2);
-		treeSchreiben();
-		Timer t = new Timer();
 
+		// Timer erstellen
+		Timer t = new Timer();
 		t.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 				if (self.isVisible()) {
+					// Benutzerliste wird aktualisiert
 					treeSchreiben();
+
 //		        	amICalled();	//TODO wieder aktivieren
-					
-					
+
 				}
 			}
-		}, 0, // run first occurrence immediately
-				30000); // run every three seconds
+		}, 100, // Erster Aufruf nach 100ms
+				30000); // Alle 30 Sekunden danach
 
 		amICalled();
 	}
 
+	/**
+	 * Funktion holt Benutzerliste und schreibt diese in JTree
+	 */
 	void treeSchreiben() {
+
 		// Url zum Aufruf mit Eingaben befüllen
 		String Anfrage = "http://localhost:8080/listPersons";
 		URL url;
@@ -222,83 +235,104 @@ public class MainMenu extends JFrame {
 				else {
 
 					List<String> l = new ArrayList<String>();
-
+					// JSONArray mit Daten aus Rückgabe befüllen
 					JSONArray ja = new JSONArray(response.toString());
-					tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("Benutzer") {
-						{
-							String hilf[];
-							DefaultMutableTreeNode node_1;
-							node_1 = new DefaultMutableTreeNode("Online");
-							DefaultMutableTreeNode node_2;
-							node_2 = new DefaultMutableTreeNode("Beschäftigt");
-							DefaultMutableTreeNode node_3;
-							node_3 = new DefaultMutableTreeNode("Nicht stören");
-							DefaultMutableTreeNode node_4;
-							node_4 = new DefaultMutableTreeNode("Offline");
-							DefaultMutableTreeNode node_5;
-							node_5 = new DefaultMutableTreeNode("Gesamt");
-							DefaultMutableTreeNode node_6;
-							node_6 = new DefaultMutableTreeNode("Keine anderen Nutzer regisitriert");	
-							
-							
-							int n1 = 0, n2 = 0, n3 = 0, n4 = 0;
+					// Icons hinzufügen
+					ImageIcon persons_icon = new ImageIcon(
+							IncomingCallPopup.class.getResource("/resources/persons_tiny.png"));
+					ImageIcon person_icon = new ImageIcon(
+							IncomingCallPopup.class.getResource("/resources/person-icon_tiny.png"));
+					ImageIcon details_icon = new ImageIcon(
+							IncomingCallPopup.class.getResource("/resources/details.png"));
+					// Erstellen der Nodes
+					CustomTreeNode top = new CustomTreeNode(details_icon, "Benutzer");
+					CustomTreeNode onlineNode = new CustomTreeNode(persons_icon, "Online");
+					CustomTreeNode busyNode = new CustomTreeNode(persons_icon, "Beschäftigt");
+					CustomTreeNode dontdisturbNode = new CustomTreeNode(persons_icon, "Nicht stören");
+					CustomTreeNode offlineNode = new CustomTreeNode(persons_icon, "Offline");
+					CustomTreeNode gesNode = new CustomTreeNode(persons_icon, "Gesamt");
+					CustomTreeNode keinNode = new CustomTreeNode(persons_icon, "Kein anderer User Registriert");
+					// Hilfsvariablen
+					String hilf[];
+					String s;
+					boolean n1 = false, n2 = false, n3 = false, n4 = false;
+					// Daten aus Jsonarray in Liste übertragen
+					for (int i = 0; i < ja.length(); i++) {
+						hilf = ja.get(i).toString().substring(10).split("\"");
+						// Falls username der eigene dann nicht aufnehmen in Liste
+						if (!hilf[4].equals(username))
+							l.add(hilf[4] + " " + hilf[0]);
 
-							for (int i = 0; i < ja.length(); i++) {
-								hilf = ja.get(i).toString().substring(10).split("\"");
-								l.add(hilf[4] + " " + hilf[0]);
+					}
+					// Liste sortieren
+					l.sort(null);
+
+					// Liste leer?
+					if (l.get(0) != null) {
+						// Für alle Listenelemente einmal abfragen
+						for (int i = 0; i < l.size(); i++) {
+							s = l.get(i).toString();
+							// Abfrage des Status der username und dann hinzufügen zur passenden Node und
+							// true setzen des zugehörigen boolean
+							if (s.contains("ONLINE")) {
+								n1 = true;
+								CustomTreeNode node = new CustomTreeNode(person_icon, s);
+								onlineNode.add(node);
 							}
-
-							l.sort(null);
-							if(l.get(1) != null)
-							{
-							for (int i = 0; i < ja.length(); i++) {
-								if(l.get(i).contains(username)==false)
-								 {
-								if (l.get(i).contains("ONLINE")) {
-									n1++;
-									
-									node_1.add(new DefaultMutableTreeNode(l.get(i)));
-
-								}
-								if (l.get(i).contains("BUSY")) {
-									n2++;
-									
-									node_2.add(new DefaultMutableTreeNode(l.get(i)));
-
-								}
-								if (l.get(i).contains("DONOTDISTURB")) {
-									n3++;
-									
-									node_3.add(new DefaultMutableTreeNode(l.get(i)));
-
-								}
-								if (l.get(i).contains("OFFLINE")) {
-									n4++;
-									
-									node_4.add(new DefaultMutableTreeNode(l.get(i)));
-
-								}
-
-								node_5.add(new DefaultMutableTreeNode(l.get(i)));
-							}}
-							//Beim öffnen mit windoweditor wird getContentPane(). vor dem add(node_n); gesetzt dies löschen führt sonst zu Problemen
-							if (n1 > 0)
-								add(node_1);
-							if (n2 > 0)
-								add(node_2);
-							if (n3 > 0)
-								add(node_3);
-							if (n4 > 0)
-								add(node_4);
-							add(node_5);
+							if (s.contains("BUSY")) {
+								n2 = true;
+								CustomTreeNode node = new CustomTreeNode(person_icon, s);
+								busyNode.add(node);
+							}
+							if (s.contains("DONOTDISTURB")) {
+								n3 = true;
+								CustomTreeNode node = new CustomTreeNode(person_icon, s);
+								dontdisturbNode.add(node);
+							}
+							if (s.contains("OFFLINE")) {
+								n4 = true;
+								CustomTreeNode node = new CustomTreeNode(person_icon, s);
+								offlineNode.add(node);
+							}
+							CustomTreeNode node = new CustomTreeNode(person_icon, s);
+							gesNode.add(node);
 						}
-							else add(node_6);
-							
-							System.out.println("Benutzerliste wurde aktualisiert")	;
-								
-							
-							}}));
+
+						// Nodes hinzufügen wenn User innerhalb der Nodes gespeichert
+						if (n1)
+							top.add(onlineNode);
+						if (n2)
+							top.add(busyNode);
+						if (n3)
+							top.add(dontdisturbNode);
+						if (n4)
+							top.add(offlineNode);
+						top.add(gesNode);
+
+					} else {
+						// Falls Liste leer nur eine Node mit keine anderen User registriert
+						top.add(keinNode);
+					}
+
+					// Tree erstellen
+					JTree tree = new JTree(top);
+
+					// Tree aufklappen
+					for (int i = 0; i < tree.getRowCount(); i++) {
+						tree.expandRow(i);
+					}
+
+					// Scrollpane erstellen und tree mitgeben
+					JScrollPane scrollPane = new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+							JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+					scrollPane.setBounds(10, 31, 205, 184);
+					getContentPane().add(scrollPane);
+					// Tree renderer um Bilder darzustellen
+					tree.setCellRenderer(new CustomTreeCellRenderer());
+					System.out.println("Benutzerliste für:" + username + " wurde aktualisiert");
+
 				}
+				// Verbindung trennen
 				con.disconnect();
 			} catch (UnsupportedEncodingException e1) {
 
@@ -315,6 +349,12 @@ public class MainMenu extends JFrame {
 		}
 	}
 
+	/**
+	 * Funktion ändert den Status des Benutzers
+	 * 
+	 * @param state gewünschter Status, mögliche sind:
+	 *              ONLINE,OFFLINE,BUSY,DONOTDISTURB
+	 */
 	void statusÄndern(String state) {
 
 		// Url zum Aufruf mit Eingaben befüllen
@@ -337,7 +377,7 @@ public class MainMenu extends JFrame {
 					System.out.println("Fehler bei der Antwort");
 				else {
 					if (response.toString().equals("true"))
-						System.out.println("Erfolgreich Status auf: " + state + " gesetzt");
+						System.out.println("Erfolgreich Status von:" + username + " auf: " + state + " gesetzt");
 					else
 						System.out.println("Status konnte nicht gesetzt werden");
 
@@ -358,7 +398,7 @@ public class MainMenu extends JFrame {
 		}
 	}
 
-	void amICalled() { 
+	void amICalled() {
 		JFrame self = this;
 		String Anfrage = "http://localhost:8080/amICalled?username=" + username;
 		System.out.println(Anfrage);
