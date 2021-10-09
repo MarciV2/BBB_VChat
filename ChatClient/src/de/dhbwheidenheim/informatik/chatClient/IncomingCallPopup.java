@@ -110,7 +110,7 @@ public class IncomingCallPopup extends JDialog {
 
 
 
-		CustomTreeNode attendeesNode=new CustomTreeNode(persons_icon,"Eingeladene");
+		CustomTreeNode attendeesNode=new CustomTreeNode(persons_icon,"Anwesende");
 		for(String s:attendees) {
 			CustomTreeNode node=new CustomTreeNode(person_icon,s);
 			attendeesNode.add(node);
