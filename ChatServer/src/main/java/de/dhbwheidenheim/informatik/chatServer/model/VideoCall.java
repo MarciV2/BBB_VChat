@@ -79,10 +79,8 @@ public class VideoCall implements Serializable{
 					//Bei PRIVAT sollen nicht eingeladene Personen nicht beitreten können
 					return false;
 				}
-			}else {
-				invitees.add(joiner);
 			}
-
+			invitees.remove(joiner);
 			attendees.add(joiner);
 			return true;
 
