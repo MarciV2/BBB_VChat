@@ -1,66 +1,48 @@
 package de.dhbwheidenheim.informatik.chatClient;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Desktop;
-import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeSet;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JTextPane;
-import javax.swing.JOptionPane;
-import javax.swing.JFrame;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.awt.event.ActionEvent;
-import java.awt.Font;
-import java.awt.Rectangle;
-
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
-import javax.swing.JPanel;
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.SwingConstants;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import java.awt.FlowLayout;
-import javax.swing.JTree;
-import javax.swing.JScrollPane;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.dhbwheidenheim.informatik.chatClient.PopupElements.CustomTreeCellRenderer;
 import de.dhbwheidenheim.informatik.chatClient.PopupElements.CustomTreeNode;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
+import javax.swing.JCheckBox;
 
 public class MainMenu extends JFrame {
 	private JTextField textField;
@@ -68,7 +50,8 @@ public class MainMenu extends JFrame {
 	private IncomingCallPopup incomingCallPopup;
 	private JTree tree;
 	private CustomTreeNode top;
-//	 private JTree tree = new JTree();
+	private JCheckBox chckbxNewCheckBox;
+	//	 private JTree tree = new JTree();
 	private JScrollPane scrollPane;
 	public MainMenu(String username) {
 		// Speichern des eigenen usernames
@@ -122,17 +105,42 @@ public class MainMenu extends JFrame {
 		JButton btnNewButton = new JButton("Ausgew\u00E4hlte Nutzer anrufen");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String selectedusername="";
-				
-				System.out.println(tree.getSelectionCount());
-				
+				ArrayList<String> selectedusernames=new ArrayList<String>();
+				String[] forbiddenNames= {"Benutzer","Online","Offline","Nicht Stören","Beschäftigt","Kein anderer User Registriert","Gesamt"};
+				for(javax.swing.tree.TreePath tp:tree.getSelectionPaths()) {
+
+					//Prüfen, dass nicht default-Nodes sondern wirklich ein Benutzer ausgewählt wurde
+					String selectedusername=tp.getLastPathComponent().toString().split(" ")[0];
+					if(!Arrays.asList(forbiddenNames).contains(selectedusername)) {
+
+						//Prüfen, dass Benutzer auch online ist
+						if(tp.getLastPathComponent().toString().split(" ")[1].equals("ONLINE")) {
+							System.out.println("Benutzer ausgewählt: " +selectedusername);
+							selectedusernames.add(selectedusername);
+						}else {
+							System.out.println("Benutzer "+selectedusername+" ist nicht Online und wird nicht eingeladen!");
+							return;
+						}
+					}
+
+				}
+				if(selectedusernames.size()==0) {
+					System.out.println("Kein valider Benutzer ausgewählt->Abgebrochen!");
+					return;
+				}
+				System.out.println("Benutzer für neuen Anruf ausgewählt: "+selectedusernames);
+
+				String callType=chckbxNewCheckBox.isSelected()?"private":"public";
+				System.out.println("Anruf erstellt?: "+createCall(selectedusernames, callType));
+
+
 			}
 		});
-		btnNewButton.setBounds(225, 29, 204, 23);
+		btnNewButton.setBounds(225, 48, 204, 23);
 		panel.add(btnNewButton);
 
 		JLabel lblNewLabel_1 = new JLabel("Status setzen:");
-		lblNewLabel_1.setBounds(235, 59, 103, 14);
+		lblNewLabel_1.setBounds(235, 93, 103, 14);
 		panel.add(lblNewLabel_1);
 		// Wenn sich Status eines Radiobuttons ändert und der Zustand selected ist wird
 		// die dazugehörige Status setzen Funktion geöffnet
@@ -144,7 +152,7 @@ public class MainMenu extends JFrame {
 			}
 		});
 		rdbtnNewRadioButton.setSelected(true);
-		rdbtnNewRadioButton.setBounds(245, 80, 109, 23);
+		rdbtnNewRadioButton.setBounds(245, 114, 109, 23);
 		panel.add(rdbtnNewRadioButton);
 
 		JRadioButton rdbtnNewRadioButton_1 = new JRadioButton("Beschäftigt");
@@ -154,7 +162,7 @@ public class MainMenu extends JFrame {
 					statusÄndern("BUSY");
 			}
 		});
-		rdbtnNewRadioButton_1.setBounds(245, 106, 109, 23);
+		rdbtnNewRadioButton_1.setBounds(245, 140, 109, 23);
 		panel.add(rdbtnNewRadioButton_1);
 
 		JRadioButton rdbtnNewRadioButton_2 = new JRadioButton("Nicht stören");
@@ -164,7 +172,7 @@ public class MainMenu extends JFrame {
 					statusÄndern("DONOTDISTURB");
 			}
 		});
-		rdbtnNewRadioButton_2.setBounds(245, 132, 126, 23);
+		rdbtnNewRadioButton_2.setBounds(245, 166, 126, 23);
 		panel.add(rdbtnNewRadioButton_2);
 
 		JRadioButton rdbtnNewRadioButton_3 = new JRadioButton("Als Offline anzeigen");
@@ -174,7 +182,7 @@ public class MainMenu extends JFrame {
 					statusÄndern("OFFLINE");
 			}
 		});
-		rdbtnNewRadioButton_3.setBounds(245, 162, 137, 23);
+		rdbtnNewRadioButton_3.setBounds(245, 196, 137, 23);
 		panel.add(rdbtnNewRadioButton_3);
 
 		JButton btnNewButton_1 = new JButton("Abmelden");
@@ -184,7 +192,7 @@ public class MainMenu extends JFrame {
 				self.setVisible(false);
 			}
 		});
-		btnNewButton_1.setBounds(225, 192, 204, 23);
+		btnNewButton_1.setBounds(225, 226, 204, 23);
 		panel.add(btnNewButton_1);
 		// Zusammengruppieren der radiobuttons
 		ButtonGroup gruppe = new ButtonGroup();
@@ -192,9 +200,9 @@ public class MainMenu extends JFrame {
 		gruppe.add(rdbtnNewRadioButton_1);
 		gruppe.add(rdbtnNewRadioButton_2);
 		gruppe.add(rdbtnNewRadioButton_3);
-		
-		
-		
+
+
+
 		top = new CustomTreeNode(new ImageIcon(
 				IncomingCallPopup.class.getResource("/resources/details.png"), "Benutzer"));
 		tree=new JTree(top);
@@ -204,9 +212,9 @@ public class MainMenu extends JFrame {
 		getContentPane().add(scrollPane);
 		// Tree renderer um Bilder darzustellen
 		tree.setCellRenderer(new CustomTreeCellRenderer());
-		
-		
-		
+
+
+
 		JButton btnNewButton_2 = new JButton("Benutzerliste aktualisieren");
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -216,22 +224,37 @@ public class MainMenu extends JFrame {
 		btnNewButton_2.setBounds(10, 226, 205, 23);
 		panel.add(btnNewButton_2);
 
-		// Timer erstellen
+		chckbxNewCheckBox = new JCheckBox("Privater Anruf");
+		chckbxNewCheckBox.setSelected(true);
+		chckbxNewCheckBox.setBounds(272, 27, 99, 23);
+		panel.add(chckbxNewCheckBox);
+
+		// Timer für Baum-Aktualisierung erstellen
 		Timer t = new Timer();
 		t.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 				if (self.isVisible()) {
 					// Benutzerliste wird aktualisiert
-//					treeSchreiben();	//TODO definitiv wieder aktivieren!
+					treeSchreiben();
 
-//		        	amICalled();	//TODO wieder aktivieren
 
 				}
 			}
 		}, 100, // Erster Aufruf nach 100ms
 				30000); // Alle 30 Sekunden danach
 
-		amICalled();
+		//Timer für Anruf-Prüfung erstellen
+		Timer t2 = new Timer();
+		t2.scheduleAtFixedRate(new TimerTask() {
+			public void run() {
+				if (self.isVisible()) {
+					amICalled();
+				}
+			}
+		}, 100, // Erster Aufruf nach 100ms
+				10000); // Alle 10 Sekunden danach
+
+
 	}
 
 	/**
@@ -341,15 +364,15 @@ public class MainMenu extends JFrame {
 					}
 
 					// Tree erstellen
-//					 tree = new JTree(top);
+					//					 tree = new JTree(top);
 					((DefaultTreeModel) tree.getModel()).setRoot(top);
 
 					// Tree aufklappen
 					for (int i = 0; i < tree.getRowCount(); i++) {
 						tree.expandRow(i);
 					}
-					
-					
+
+
 					System.out.println("Benutzerliste für:" + username + " wurde aktualisiert");
 
 				}
@@ -435,7 +458,7 @@ public class MainMenu extends JFrame {
 					response.append(responseLine.trim());
 				}
 				if (response.isEmpty())
-					System.out.println("Fehler bei der Antwort");
+					System.out.println("kein eingehender Anruf für Benutzer "+username);
 				else {
 					System.out.println("AmiCalled-Antwort: " + response.toString());
 					// Nur popup anzeigen, wenn noch nicht angezeigt
@@ -455,10 +478,10 @@ public class MainMenu extends JFrame {
 							attendees.add(o.getString("username"));
 						}
 						//TODO überprüfen ob id so bestimmt werden kann
-						String id=call.getString("id");
+						String id=String.valueOf(call.getInt("id"));
 						String organizer = call.getJSONObject("organizer").getString("username");
-//						invitees.remove(organizer);
-//						invitees.remove(username);
+						//						invitees.remove(organizer);
+						//						invitees.remove(username);
 						incomingCallPopup = new IncomingCallPopup(roomURI, organizer, isPrivate, invitees, attendees,id,username);
 					}
 					incomingCallPopup.setVisible(true);
@@ -471,4 +494,47 @@ public class MainMenu extends JFrame {
 			e1.printStackTrace();
 		}
 	}
+
+
+	private String createCall(ArrayList<String> users, String callType) {
+
+		Map<String, String> parameters = new HashMap<>();
+		parameters.put("organizername", username);
+		parameters.put("callType", callType);
+
+		//Einzuladende umformatieren und anhängen
+		String inviteesStr="";
+		for(String s:users) inviteesStr+=s+",";
+		inviteesStr=inviteesStr.substring(0, inviteesStr.length()-1);
+		parameters.put("invitees", inviteesStr);
+
+		try {
+			return doHttpRequest("newCall", parameters);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
+
+	public String doHttpRequest(String reqMethod, Map<String,String>params) throws IOException {
+		URL url = new URL("http://localhost:8080/"+reqMethod+"?"+ParameterStringBuilder.getParamsString(params));
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+
+		//Antwort lesen
+		BufferedReader in = new BufferedReader(
+				new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuffer content = new StringBuffer();
+		while ((inputLine = in.readLine()) != null) {
+			content.append(inputLine);
+		}
+		in.close();
+		con.disconnect();
+
+		return content.toString();
+	}
+
 }

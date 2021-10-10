@@ -6,6 +6,8 @@ import java.util.List;
 
 import de.dhbwheidenheim.informatik.chatServer.model.enums.CallState;
 import de.dhbwheidenheim.informatik.chatServer.model.enums.RoomState;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
 public class VideoCall implements Serializable{
 	private static final long serialVersionUID = 1L;
@@ -27,6 +29,11 @@ public class VideoCall implements Serializable{
 		invitees=new ArrayList<Person>();
 		invitees.add(organizer);
 		attendees=new ArrayList<Person>();
+	}
+	@Override
+	public String toString() {
+		System.out.println("toString");
+		return null;
 	}
 	public int getId() {
 		return id;

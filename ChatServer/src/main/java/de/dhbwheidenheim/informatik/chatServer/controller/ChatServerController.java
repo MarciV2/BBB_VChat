@@ -150,7 +150,7 @@ public class ChatServerController {
 	 * @return CallID, null wenn Organisator nicht gefunden wurde oder kein freier Raum verfügbar ist
 	 */
 	@GetMapping("/newCall")
-	public @ResponseBody Object newCall(@RequestParam String callType, @RequestParam String organizername) {
+	public @ResponseBody Object newCall(@RequestParam String callType, @RequestParam String organizername, @RequestParam String[] invitees) {
 		//Organisator identifizieren
 		Person org = null;
 		for(Person p:personList) {
@@ -166,11 +166,16 @@ public class ChatServerController {
 					boolean privateCall=callType.equalsIgnoreCase("private")? true : false;
 					VideoCall nCall=new VideoCall(callsList.size(),org, cr,privateCall);
 					cr.setState(RoomState.OCCUPIED);
-					long id=(long) callsList.size();
+					for(String s:invitees) {
+						//Person identifizieren
+						for(Person p:personList) 
+							if(p.getUsername().equals(s)) {
+								nCall.invitePerson(p);
+							}	
+					}
 					callsList.add(nCall);
-					System.out.println(id);
 					saveData();
-					return id;
+					return nCall.getId();
 				}
 			} System.out.println("kein freier Raum");
 

@@ -35,11 +35,11 @@ public class IncomingCallPopup extends JDialog {
 
 		this.setAlwaysOnTop(true);
 		getContentPane().setLayout(null);
-		
+
 		URL iconURL = getClass().getResource("/resources/BigBlueButton_icon.svg.png");
 		ImageIcon icon = new ImageIcon(iconURL);
 		this.setIconImage(icon.getImage());
-		
+
 		JLabel lblNewLabel = new JLabel("Eingehender Anruf von ");
 		lblNewLabel.setBounds(10, 0, 140, 30);
 		getContentPane().add(lblNewLabel);
@@ -62,7 +62,42 @@ public class IncomingCallPopup extends JDialog {
 		btnNewButton_1.setFocusPainted(false);
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO Decline call einbauen
+				String Anfrage = "http://localhost:8080/leaveCall?username=" + username + "&callID=" + id;
+				URL url;
+				try {
+					// HTTPRequest Erstellung
+
+					url = new URL(Anfrage);
+					HttpURLConnection con = (HttpURLConnection) url.openConnection();
+					con.setRequestMethod("GET");
+					// Abfrage der Rückgabe des Requests
+					try (BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"))) {
+						StringBuilder response = new StringBuilder();
+						String responseLine = null;
+						while ((responseLine = br.readLine()) != null) {
+							response.append(responseLine.trim());
+						}
+						if (response.isEmpty())
+							System.out.println("Fehler bei der Antwort");
+						else {
+							if (response.toString().equals("true"))
+								System.out.println("Erfolgreich Anruf an:" + username + " mit ID: " + id + " abgelehnt");
+							else
+								System.out.println("Fehler beim Ablehnen des Anruf");
+
+						}
+						con.disconnect();
+					} catch (UnsupportedEncodingException e1) {
+
+						e1.printStackTrace();
+					} catch (IOException e1) {
+
+						System.out.println("Fehler bei HTTP Request Spring Boot Server muss gestartet sein");
+					}
+				}
+
+				catch (IOException e1) {}		
+
 				self.setVisible(false);
 			}
 		});
@@ -78,6 +113,36 @@ public class IncomingCallPopup extends JDialog {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					String Anfrage = "http://localhost:8080/joinCall?callID=" + id + "&username=" + username;
+					URL url;
+					try {
+						// HTTPRequest Erstellung
+
+						url = new URL(Anfrage);
+						HttpURLConnection con = (HttpURLConnection) url.openConnection();
+						con.setRequestMethod("GET");
+						// Abfrage der Rückgabe des Requests
+						try (BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"))) {
+							StringBuilder response = new StringBuilder();
+							String responseLine = null;
+							while ((responseLine = br.readLine()) != null) {
+								response.append(responseLine.trim());
+							}
+							if (response.isEmpty())
+								System.out.println("Fehler bei der Antwort");
+							else {
+								System.out.println("Erfolgreich Anruf an:" + username + " mit ID: " + id + " angenommen");
+							}
+							con.disconnect();
+						} catch (UnsupportedEncodingException e1) {
+
+							e1.printStackTrace();
+						} catch (IOException e1) {
+
+							System.out.println("Fehler bei HTTP Request Spring Boot Server muss gestartet sein");
+						}
+					}catch (IOException e1) {}		
+
 					Desktop.getDesktop().browse(roomURL);
 					PopupLeaveCall lc = new PopupLeaveCall(username,id);
 					lc.setVisible(true);
@@ -85,7 +150,7 @@ public class IncomingCallPopup extends JDialog {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-				
+
 			}
 		});
 
@@ -101,7 +166,7 @@ public class IncomingCallPopup extends JDialog {
 
 
 
-		
+
 
 		CustomTreeNode top=new CustomTreeNode(details_icon,"Details");
 		if(isPrivate)top.add(new CustomTreeNode(minus_icon,"Privater Anruf"));
@@ -129,10 +194,10 @@ public class IncomingCallPopup extends JDialog {
 		tree.setBounds(120, 30, 200, 200);
 		getContentPane().add(tree);
 		tree.setCellRenderer(new CustomTreeCellRenderer());
-		
+
 		//Tree aufklappen
 		for (int i = 0; i < tree.getRowCount(); i++) {
-		    tree.expandRow(i);
+			tree.expandRow(i);
 		}
 
 		getContentPane().add(btnNewButton_1);
