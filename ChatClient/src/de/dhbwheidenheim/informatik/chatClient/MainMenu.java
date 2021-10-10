@@ -97,7 +97,7 @@ public class MainMenu extends JFrame {
 
 						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 					statusÄndern("OFFLINE");
-					self.setVisible(false);
+					//self.setVisible(false);
 				}
 			}
 		});
@@ -348,7 +348,7 @@ public class MainMenu extends JFrame {
 					for (int i = 0; i < tree.getRowCount(); i++) {
 						tree.expandRow(i);
 					}
-					// Scrollpane erstellen und tree mitgeben
+					
 					
 					System.out.println("Benutzerliste für:" + username + " wurde aktualisiert");
 
@@ -454,10 +454,12 @@ public class MainMenu extends JFrame {
 							JSONObject o = new JSONObject(String.valueOf(s));
 							attendees.add(o.getString("username"));
 						}
+						//TODO überprüfen ob id so bestimmt werden kann
+						String id=call.getString("id");
 						String organizer = call.getJSONObject("organizer").getString("username");
 //						invitees.remove(organizer);
 //						invitees.remove(username);
-						incomingCallPopup = new IncomingCallPopup(roomURI, organizer, isPrivate, invitees, attendees);
+						incomingCallPopup = new IncomingCallPopup(roomURI, organizer, isPrivate, invitees, attendees,id,username);
 					}
 					incomingCallPopup.setVisible(true);
 				}

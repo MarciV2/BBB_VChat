@@ -23,7 +23,7 @@ import de.dhbwheidenheim.informatik.chatClient.PopupElements.CustomTreeNode;
 
 public class IncomingCallPopup extends JDialog {
 
-	public IncomingCallPopup(URI roomURL, String organizername ,boolean isPrivate, ArrayList<String> otherInvitees, ArrayList<String> attendees ) {
+	public IncomingCallPopup(URI roomURL, String organizername ,boolean isPrivate, ArrayList<String> otherInvitees, ArrayList<String> attendees, String id, String username ) {
 		setTitle("Eingehender Anruf!");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(IncomingCallPopup.class.getResource("/resources/acceptCall_small.png")));
 		IncomingCallPopup self=this;
@@ -72,11 +72,15 @@ public class IncomingCallPopup extends JDialog {
 		btnNewButton.setFocusPainted(false);
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					Desktop.getDesktop().browse(roomURL);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+//				try {
+//					Desktop.getDesktop().browse(roomURL);
+//				} catch (IOException e1) {
+//					e1.printStackTrace();
+//				}
+				//TODO joincall umsetzung und website aufrufen
+				
+				PopupLeaveCall lc = new PopupLeaveCall(username,id);
+				lc.setVisible(true);
 				self.setVisible(false);
 			}
 		});

@@ -14,7 +14,7 @@ public class PopupTestMain {
 			list.add("blablabla");
 			
 			
-			popup = new IncomingCallPopup(new URI("http://marci.vidmar.de"), "Organisator", false, list, list);
+			popup = new IncomingCallPopup(new URI("http://marci.vidmar.de"), "Organisator", false, list, list,"0","0");
 			popup.setVisible(true);
 
 		} catch (URISyntaxException e) {
