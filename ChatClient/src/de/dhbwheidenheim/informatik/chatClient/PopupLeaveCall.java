@@ -74,7 +74,7 @@ private String id;
 		{
 			
 			//Url zum Aufruf mit Eingaben befüllen
-			String Anfrage = "http://localhost:8080/login?leaveCall="+username+"&callID="+id;
+			String Anfrage = "http://localhost:8080/login?leaveCall=username"+username+"&callID="+id;
 			URL url;
 			try {
 				//HTTPRequest Erstellung

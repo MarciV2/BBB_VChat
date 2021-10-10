@@ -6,7 +6,11 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -58,6 +62,7 @@ public class IncomingCallPopup extends JDialog {
 		btnNewButton_1.setFocusPainted(false);
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				//TODO Decline call einbauen
 				self.setVisible(false);
 			}
 		});
@@ -72,16 +77,15 @@ public class IncomingCallPopup extends JDialog {
 		btnNewButton.setFocusPainted(false);
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				try {
-//					Desktop.getDesktop().browse(roomURL);
-//				} catch (IOException e1) {
-//					e1.printStackTrace();
-//				}
-				//TODO joincall umsetzung und website aufrufen
+				try {
+					Desktop.getDesktop().browse(roomURL);
+					PopupLeaveCall lc = new PopupLeaveCall(username,id);
+					lc.setVisible(true);
+					self.setVisible(false);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 				
-				PopupLeaveCall lc = new PopupLeaveCall(username,id);
-				lc.setVisible(true);
-				self.setVisible(false);
 			}
 		});
 
