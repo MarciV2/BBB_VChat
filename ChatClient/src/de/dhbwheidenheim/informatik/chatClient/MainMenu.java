@@ -445,7 +445,7 @@ public class MainMenu extends JFrame {
 	void amICalled() {
 		JFrame self = this;
 		String Anfrage = "http://localhost:8080/amICalled?username=" + username;
-		System.out.println(Anfrage);
+		
 		URL url;
 		try {
 			url = new URL(Anfrage);
@@ -460,7 +460,7 @@ public class MainMenu extends JFrame {
 				if (response.isEmpty())
 					System.out.println("kein eingehender Anruf für Benutzer "+username);
 				else {
-					System.out.println("AmiCalled-Antwort: " + response.toString());
+					//System.out.println("AmiCalled-Antwort: " + response.toString());
 					// Nur popup anzeigen, wenn noch nicht angezeigt
 					if (incomingCallPopup == null || !incomingCallPopup.isVisible()) {
 						JSONObject call = new JSONObject(response.toString());

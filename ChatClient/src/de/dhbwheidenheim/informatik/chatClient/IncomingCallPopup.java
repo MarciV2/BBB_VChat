@@ -19,36 +19,35 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
 
 import de.dhbwheidenheim.informatik.chatClient.PopupElements.CustomTreeCellRenderer;
 import de.dhbwheidenheim.informatik.chatClient.PopupElements.CustomTreeNode;
 
-public class IncomingCallPopup extends JDialog {
-
+public class IncomingCallPopup extends JFrame {
+	private JScrollPane scrollPane;
 	public IncomingCallPopup(URI roomURL, String organizername ,boolean isPrivate, ArrayList<String> otherInvitees, ArrayList<String> attendees, String id, String username ) {
 		setTitle("Eingehender Anruf!");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(IncomingCallPopup.class.getResource("/resources/acceptCall_small.png")));
 		IncomingCallPopup self=this;
 
-
+		
 		this.setAlwaysOnTop(true);
 		getContentPane().setLayout(null);
 
 		URL iconURL = getClass().getResource("/resources/BigBlueButton_icon.svg.png");
 		ImageIcon icon = new ImageIcon(iconURL);
+		String überschrift;
 		this.setIconImage(icon.getImage());
-
-		JLabel lblNewLabel = new JLabel("Eingehender Anruf von ");
-		lblNewLabel.setBounds(10, 0, 140, 30);
+		if(username.equals(organizername))überschrift ="Angemeldet als: "+username+" eigenem Anruf beitreten?";
+		else überschrift ="Eingehender Anruf an: "+username+" von: " +organizername;
+		JLabel lblNewLabel = new JLabel(überschrift);
+		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lblNewLabel.setBounds(10, 0, 420, 30);
 		getContentPane().add(lblNewLabel);
-
-		JLabel lblOrgName=new JLabel(organizername);
-		lblOrgName.setFont(new Font("Tahoma", Font.BOLD, 20));
-		lblOrgName.setBounds(150, 0, 200, 25);
-		lblOrgName.setPreferredSize(new Dimension(100,30));
-		getContentPane().add(lblOrgName);
 
 
 		JButton btnNewButton_1 = new JButton("");
@@ -64,9 +63,9 @@ public class IncomingCallPopup extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				String Anfrage = "http://localhost:8080/leaveCall?username=" + username + "&callID=" + id;
 				URL url;
-				try {
+				try { 
 					// HTTPRequest Erstellung
-
+					
 					url = new URL(Anfrage);
 					HttpURLConnection con = (HttpURLConnection) url.openConnection();
 					con.setRequestMethod("GET");
@@ -81,7 +80,7 @@ public class IncomingCallPopup extends JDialog {
 							System.out.println("Fehler bei der Antwort");
 						else {
 							if (response.toString().equals("true"))
-								System.out.println("Erfolgreich Anruf an:" + username + " mit ID: " + id + " abgelehnt");
+								System.out.println("Erfolgreich Anruf als:" + username + " mit ID: " + id + " abgelehnt");
 							else
 								System.out.println("Fehler beim Ablehnen des Anruf");
 
@@ -199,7 +198,11 @@ public class IncomingCallPopup extends JDialog {
 		for (int i = 0; i < tree.getRowCount(); i++) {
 			tree.expandRow(i);
 		}
-
+		scrollPane = new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setBounds(120, 30, 200, 200);
+		getContentPane().add(scrollPane);
+		
 		getContentPane().add(btnNewButton_1);
 
 
