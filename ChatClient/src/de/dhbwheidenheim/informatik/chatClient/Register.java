@@ -43,12 +43,13 @@ public class Register extends JFrame {
 	private JPasswordField passwordField;
 
 	public Register() {
-		//Grundeinstellungen des Windows
-		Register self=this;
+		// Grundeinstellungen des Windows (Größe, Sklaierbarkeit, Ort)
+		Register self = this;
 		self.setAlwaysOnTop(true);
 		self.setSize(220, 165);
 		self.setResizable(false);
 		setLocationRelativeTo(null);
+		// Window Icon festlegen
 		URL iconURL = getClass().getResource("/resources/BigBlueButton_icon.svg.png");
 		ImageIcon icon = new ImageIcon(iconURL);
 		self.setIconImage(icon.getImage());
@@ -64,7 +65,6 @@ public class Register extends JFrame {
 		JLabel lblNewLabel_1 = new JLabel("Benutzername:");
 		lblNewLabel_1.setBounds(10, 39, 75, 14);
 
-
 		JLabel lblNewLabel_3 = new JLabel("Passwort:");
 		lblNewLabel_3.setBounds(10, 67, 58, 14);
 
@@ -74,86 +74,104 @@ public class Register extends JFrame {
 
 		JButton btnNewButton = new JButton("Registrieren");
 		btnNewButton.setBounds(10, 92, 180, 23);
-		//Button zur Registrierung geklickt
+		// Button zur Registrierung geklickt
 		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) 
-			{
-				//Registrierungsrequest
+			public void actionPerformed(ActionEvent e) {
+				// Registrierungsrequest
 				String username = textField.getText();
-				String p=new String(passwordField.getPassword());
-				
-				//Grundvorgaben der Felder
-				if(username.isEmpty()||p.isEmpty())
+				String p = new String(passwordField.getPassword());
+
+				// Grundvorgaben der Felder
+				if (username.isEmpty() || p.isEmpty())
 					System.out.println("Bitte die Felder ausfüllen");
-				else
-				{
-					if(username.contains("\"")||username.contains(":")||username.contains(",")||username.contains("{")||username.contains("}")||username.contains("[")||username.contains("]")||username.contains(" "))
-						System.out.println("Sonderzeichen wie (Leerzeichen :,\"{}[]) sind für den usernamen nicht erlaubt");
+				else {
+					if (username.contains("\"") || username.contains(":") || username.contains(",")
+							|| username.contains("{") || username.contains("}") || username.contains("[")
+							|| username.contains("]") || username.contains(" "))
+						System.out.println(
+								"Sonderzeichen wie (Leerzeichen :,\"{}[]) sind für den usernamen nicht erlaubt");
 					else {
-						if(username.equals("username"))
+						if (username.equals("username"))
 							System.out.println("Der Benutzername darf nicht username sein");
 						else {
-				if(username.length()>15||p.length()>15)
-						System.out.println("Die maximale Eingabelänge ist 16 Zeichen");
-					else {
-						
-				//Passwort verschlüsseln
-				String generatedPassword = null;
-				try {
-					MessageDigest md = MessageDigest.getInstance("SHA-512");
-					md.reset();
-					byte[] rawBytes=p.getBytes(StandardCharsets.UTF_8);
-					byte[] bytes = md.digest(p.getBytes(StandardCharsets.UTF_8));
-					StringBuilder sb = new StringBuilder();
-					for(int i=0; i< bytes.length ;i++){
-						sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-					}
-					generatedPassword = sb.toString();
-				} catch (NoSuchAlgorithmException ex) {
-					ex.printStackTrace();
-				}
-						//Url zum Aufruf mit Eingaben befüllen
-						String Anfrage = "http://localhost:8080/registerPerson?username="+username+"&password="+generatedPassword;
-						URL url;
-						try {
-							//HTTPRequest Erstellung
-							
-							url = new URL(Anfrage);
-							HttpURLConnection con = (HttpURLConnection) url.openConnection();
-							con.setRequestMethod("GET");
-							//Abfrage der Rückgabe des Requests
-							try(BufferedReader br = new BufferedReader(
-									new InputStreamReader(con.getInputStream(), "utf-8"))) {
-								StringBuilder response = new StringBuilder();
-								String responseLine = null;
-								while ((responseLine = br.readLine()) != null) {
-									response.append(responseLine.trim());
-								}
-								if(response.isEmpty()) System.out.println("Fehler bei der Antwort");
+							if (username.equals("Benutzer") || username.equals("Online")
+									|| username.equals("Nicht Stören") || username.equals("Beschäftigt")
+									|| username.equals("Gesamt"))
+								System.out.println(
+										"Die Strings \"Benutzer\",\"Online\",\"Offline\",\"Nicht Stören\",\"Beschäftigt\",\"Gesamt\" sind ungültig");
+							else {
+								if (username.length() > 15 || p.length() > 15)
+									System.out.println("Die maximale Eingabelänge ist 16 Zeichen");
 								else {
-									if(response.toString().equals("Fehler der Username ist bereits vergeben"))
-										System.out.println(response);
-									else
-									System.out.println("Erfolgreich registriert, ihr Benutzername ist:"+response.toString());
-									self.setVisible(false);
+
+									// Passwort mittels SHA-512 verschlüsseln
+									String generatedPassword = null;
+									try {
+										MessageDigest md = MessageDigest.getInstance("SHA-512");
+										md.reset();
+										byte[] rawBytes = p.getBytes(StandardCharsets.UTF_8);
+										byte[] bytes = md.digest(p.getBytes(StandardCharsets.UTF_8));
+										StringBuilder sb = new StringBuilder();
+										for (int i = 0; i < bytes.length; i++) {
+											sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+										}
+										generatedPassword = sb.toString();
+									} catch (NoSuchAlgorithmException ex) {
+										ex.printStackTrace();
+									}
+									// Url zum Aufruf mit Eingaben befüllen
+									String Anfrage = "http://localhost:8080/registerPerson?username=" + username
+											+ "&password=" + generatedPassword;
+									URL url;
+									try {
+										// HTTPRequest Erstellung
+
+										url = new URL(Anfrage);
+										HttpURLConnection con = (HttpURLConnection) url.openConnection();
+										con.setRequestMethod("GET");
+										// Abfrage der Rückgabe des Requests
+										try (BufferedReader br = new BufferedReader(
+												new InputStreamReader(con.getInputStream(), "utf-8"))) {
+											StringBuilder response = new StringBuilder();
+											String responseLine = null;
+											while ((responseLine = br.readLine()) != null) {
+												response.append(responseLine.trim());
+											}
+											// Rückgabe leer?
+											if (response.isEmpty())
+												System.out.println("Fehler bei der Antwort");
+											else {
+
+												if (response.toString()
+														.equals("Fehler der Username ist bereits vergeben"))
+													System.out.println(response);
+												else
+													System.out.println("Erfolgreich registriert, ihr Benutzername ist:"
+															+ response.toString());
+												// Bei erfolgreichem Registrieren Fenster schließen
+												self.setVisible(false);
+											}
+											con.disconnect();
+										} catch (UnsupportedEncodingException e1) {
+
+											e1.printStackTrace();
+										} catch (IOException e1) {
+
+											System.out.println(
+													"Fehler bei HTTP Request Spring Boot Server muss gestartet sein");
+										}
+									}
+
+									catch (IOException e1) {
+
+										// e1.printStackTrace();
+									}
+
 								}
-								con.disconnect();
-							} catch (UnsupportedEncodingException e1) {
-								
-								e1.printStackTrace();
-							} catch (IOException e1) {
-								
-								System.out.println("Fehler bei HTTP Request Spring Boot Server muss gestartet sein");
 							}
-							}
-							
-						 catch (IOException e1)  {
-							
-							//e1.printStackTrace();
 						}
-						
-					}	
-				}}}
+					}
+				}
 			}
 		});
 

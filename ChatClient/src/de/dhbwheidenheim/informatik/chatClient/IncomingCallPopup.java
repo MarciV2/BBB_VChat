@@ -33,15 +33,18 @@ public class IncomingCallPopup extends JFrame {
 		setTitle("Eingehender Anruf!");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(IncomingCallPopup.class.getResource("/resources/acceptCall_small.png")));
 		IncomingCallPopup self=this;
-
 		
+		this.setSize(450,275);
+		this.setResizable(false);
 		this.setAlwaysOnTop(true);
 		getContentPane().setLayout(null);
 
+		//WIndowicon festlegen
 		URL iconURL = getClass().getResource("/resources/BigBlueButton_icon.svg.png");
 		ImageIcon icon = new ImageIcon(iconURL);
-		String überschrift;
 		this.setIconImage(icon.getImage());
+		//Label zur Überschrift bestimmen und anzeigen
+		String überschrift;
 		if(username.equals(organizername))überschrift ="Angemeldet als: "+username+" eigenem Anruf beitreten?";
 		else überschrift ="Eingehender Anruf an: "+username+" von: " +organizername;
 		JLabel lblNewLabel = new JLabel(überschrift);
@@ -60,7 +63,9 @@ public class IncomingCallPopup extends JFrame {
 		btnNewButton_1.setContentAreaFilled(false);
 		btnNewButton_1.setFocusPainted(false);
 		btnNewButton_1.addActionListener(new ActionListener() {
+			//Button gedrückt
 			public void actionPerformed(ActionEvent e) {
+				//Ablehnen des Anrufs
 				String Anfrage = "http://localhost:8080/leaveCall?username=" + username + "&callID=" + id;
 				URL url;
 				try { 
@@ -110,8 +115,10 @@ public class IncomingCallPopup extends JFrame {
 		btnNewButton.setContentAreaFilled(false);
 		btnNewButton.setFocusPainted(false);
 		btnNewButton.addActionListener(new ActionListener() {
+			//Button gedrückt
 			public void actionPerformed(ActionEvent e) {
 				try {
+					//Anruf annehmen
 					String Anfrage = "http://localhost:8080/joinCall?callID=" + id + "&username=" + username;
 					URL url;
 					try {
@@ -156,7 +163,7 @@ public class IncomingCallPopup extends JFrame {
 		getContentPane().add(btnNewButton);
 
 
-
+		//Icon einlesen für Custom Jtree
 		ImageIcon persons_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/persons_tiny.png"));		
 		ImageIcon person_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/person-icon_tiny.png"));	
 		ImageIcon plus_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/plus.png"));	
@@ -166,11 +173,13 @@ public class IncomingCallPopup extends JFrame {
 
 
 
-
+		//Rootnode
 		CustomTreeNode top=new CustomTreeNode(details_icon,"Details");
+		//Node gibt an ob Anruf privat
 		if(isPrivate)top.add(new CustomTreeNode(minus_icon,"Privater Anruf"));
 		else top.add(new CustomTreeNode(plus_icon,"Öffentlicher Anruf"));
 
+		//Node für die eingeladenen User
 		CustomTreeNode inviteesNode=new CustomTreeNode(persons_icon,"Eingeladene");
 		for(String s:otherInvitees) {
 			CustomTreeNode node=new CustomTreeNode(person_icon,s);
@@ -181,7 +190,7 @@ public class IncomingCallPopup extends JFrame {
 
 
 
-
+		//Node für die User die bereits beigetreten sind
 		CustomTreeNode attendeesNode=new CustomTreeNode(persons_icon,"Anwesende");
 		for(String s:attendees) {
 			CustomTreeNode node=new CustomTreeNode(person_icon,s);
@@ -189,15 +198,15 @@ public class IncomingCallPopup extends JFrame {
 		}
 		top.add(attendeesNode);
 
+		//Tree erstellen anhand von vorhandenen Nodes
 		JTree tree = new JTree(top);
-		tree.setBounds(120, 30, 200, 200);
-		getContentPane().add(tree);
 		tree.setCellRenderer(new CustomTreeCellRenderer());
 
 		//Tree aufklappen
 		for (int i = 0; i < tree.getRowCount(); i++) {
 			tree.expandRow(i);
 		}
+		//Scrollpane erstelln und tree hier hinzufügen um diesen scrollbar zu machen
 		scrollPane = new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setBounds(120, 30, 200, 200);
@@ -208,8 +217,7 @@ public class IncomingCallPopup extends JFrame {
 
 
 
-		this.setSize(450,275);
-		this.setResizable(false);
+		
 	}
 }
 

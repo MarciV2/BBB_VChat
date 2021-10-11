@@ -64,7 +64,7 @@ public class MainMenu extends JFrame {
 		this.setIconImage(icon.getImage());
 		// Grundeinstellung für Fenster wie Größe festlegen und Veränderungen verbieten
 		self.setAlwaysOnTop(true);
-		self.setSize(1000, 1000);
+		self.setSize(467, 305);
 		self.setResizable(false);
 		getContentPane().setLayout(null);
 		// Fenster in der Mitte zentriert öffnen
@@ -86,7 +86,7 @@ public class MainMenu extends JFrame {
 		});
 		// Gui Elemente hinzufügen
 		JPanel panel = new JPanel();
-		panel.setBounds(10, 11, 439, 309);
+		panel.setBounds(10, 11, 444, 258);
 		getContentPane().add(panel);
 		panel.setLayout(null);
 
@@ -104,8 +104,10 @@ public class MainMenu extends JFrame {
 
 		JButton btnNewButton = new JButton("Ausgew\u00E4hlte Nutzer anrufen");
 		btnNewButton.addActionListener(new ActionListener() {
+			//Button gedrückt
 			public void actionPerformed(ActionEvent e) {
 				ArrayList<String> selectedusernames=new ArrayList<String>();
+				//Vorgabe welche Nodes verboten sind
 				String[] forbiddenNames= {"Benutzer","Online","Offline","Nicht Stören","Beschäftigt","Kein anderer User Registriert","Gesamt"};
 				for(javax.swing.tree.TreePath tp:tree.getSelectionPaths()) {
 
@@ -119,24 +121,25 @@ public class MainMenu extends JFrame {
 							selectedusernames.add(selectedusername);
 						}else {
 							System.out.println("Benutzer "+selectedusername+" ist nicht Online und wird nicht eingeladen!");
-							return;
 						}
 					}
 
 				}
+				//Wurde ein gültiger Name ausgewählt
 				if(selectedusernames.size()==0) {
 					System.out.println("Kein valider Benutzer ausgewählt->Abgebrochen!");
 					return;
 				}
 				System.out.println("Benutzer für neuen Anruf ausgewählt: "+selectedusernames);
 
+				//Eigntliche Anrufsfunktion
 				String callType=chckbxNewCheckBox.isSelected()?"private":"public";
 				System.out.println("Anruf erstellt?: "+createCall(selectedusernames, callType));
 
 
 			}
 		});
-		btnNewButton.setBounds(225, 48, 204, 23);
+		btnNewButton.setBounds(225, 57, 204, 23);
 		panel.add(btnNewButton);
 
 		JLabel lblNewLabel_1 = new JLabel("Status setzen:");
@@ -202,7 +205,7 @@ public class MainMenu extends JFrame {
 		gruppe.add(rdbtnNewRadioButton_3);
 
 
-
+		//Scrollbar und tree initialisieren
 		top = new CustomTreeNode(new ImageIcon(
 				IncomingCallPopup.class.getResource("/resources/details.png"), "Benutzer"));
 		tree=new JTree(top);
@@ -221,12 +224,13 @@ public class MainMenu extends JFrame {
 				treeSchreiben();
 			}
 		});
-		btnNewButton_2.setBounds(10, 226, 205, 23);
+		btnNewButton_2.setBounds(0, 226, 215, 23);
 		panel.add(btnNewButton_2);
-
+		
+		//Möglichkeit für öffentliche Anrufe
 		chckbxNewCheckBox = new JCheckBox("Privater Anruf");
 		chckbxNewCheckBox.setSelected(true);
-		chckbxNewCheckBox.setBounds(272, 27, 99, 23);
+		chckbxNewCheckBox.setBounds(272, 27, 137, 23);
 		panel.add(chckbxNewCheckBox);
 
 		// Timer für Baum-Aktualisierung erstellen
@@ -364,7 +368,7 @@ public class MainMenu extends JFrame {
 					}
 
 					// Tree erstellen
-					//					 tree = new JTree(top);
+					
 					((DefaultTreeModel) tree.getModel()).setRoot(top);
 
 					// Tree aufklappen
@@ -441,9 +445,11 @@ public class MainMenu extends JFrame {
 			// e1.printStackTrace();
 		}
 	}
-
+/**
+ * Funktion frägt mittels Polling ab ob ein Anruf existiert in den der User eingeladen wurde
+ */
 	void amICalled() {
-		JFrame self = this;
+		
 		String Anfrage = "http://localhost:8080/amICalled?username=" + username;
 		
 		URL url;
@@ -495,7 +501,12 @@ public class MainMenu extends JFrame {
 		}
 	}
 
-
+/**
+ * Funktion erstellt einen Anruf anhand der übergebenen Liste
+ * @param users Liste mit den anzurufenden Teilnehmer
+ * @param callType gibt an ob Anruf privat/öffentlich ist
+ * @return
+ */
 	private String createCall(ArrayList<String> users, String callType) {
 
 		Map<String, String> parameters = new HashMap<>();
@@ -509,6 +520,7 @@ public class MainMenu extends JFrame {
 		parameters.put("invitees", inviteesStr);
 
 		try {
+			//Aufruf HTTPRequest Methode und die Antwort dieser wird zurückgegben
 			return doHttpRequest("newCall", parameters);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -517,8 +529,15 @@ public class MainMenu extends JFrame {
 
 	}
 
-
+/**
+ * Funktion um HTTPRequest für Amruf zu starten
+ * @param reqMethod
+ * @param params
+ * @return
+ * @throws IOException
+ */
 	public String doHttpRequest(String reqMethod, Map<String,String>params) throws IOException {
+		//Aufruf Url Erstellung
 		URL url = new URL("http://localhost:8080/"+reqMethod+"?"+ParameterStringBuilder.getParamsString(params));
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
@@ -534,6 +553,7 @@ public class MainMenu extends JFrame {
 		in.close();
 		con.disconnect();
 
+		//Gibt Antwort zurück an createCall Funktion
 		return content.toString();
 	}
 

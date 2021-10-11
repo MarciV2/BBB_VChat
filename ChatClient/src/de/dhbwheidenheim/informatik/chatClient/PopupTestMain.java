@@ -12,7 +12,10 @@ public class PopupTestMain {
 			ArrayList<String> list=new ArrayList<String>();
 			list.add("blabla");
 			list.add("blablabla");
-			
+			list.add("blablabla");
+			list.add("blablabla");
+			list.add("blablabla");
+			list.add("blablabla");
 			
 			popup = new IncomingCallPopup(new URI("http://marci.vidmar.de"), "Organisator", false, list, list,"0","0");
 			popup.setVisible(true);

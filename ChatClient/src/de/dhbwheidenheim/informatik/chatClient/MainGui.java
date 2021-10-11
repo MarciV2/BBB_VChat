@@ -21,145 +21,146 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.LogManager;
 
 public class MainGui extends JFrame {
 	private JTextField textField;
 	private JPasswordField passwordField;
 	static String username;
+
 	public MainGui() {
-		getContentPane().setLayout(null);
+		// Windowicon festlegen
 		URL iconURL = getClass().getResource("/resources/BigBlueButton_icon.svg.png");
 		ImageIcon icon = new ImageIcon(iconURL);
 		this.setIconImage(icon.getImage());
+
 		JLabel lblNewLabel = new JLabel("Anmelden:");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblNewLabel.setBounds(10, 11, 87, 14);
 		getContentPane().add(lblNewLabel);
-		
+		getContentPane().setLayout(null);
 		JLabel lblNewLabel_1 = new JLabel("Benutzername:");
 		lblNewLabel_1.setBounds(10, 36, 76, 14);
 		getContentPane().add(lblNewLabel_1);
-		
+
 		JLabel lblNewLabel_2 = new JLabel("Passwort:");
 		lblNewLabel_2.setBounds(10, 61, 58, 14);
 		getContentPane().add(lblNewLabel_2);
-		
+
 		textField = new JTextField();
 		textField.setBounds(96, 33, 108, 20);
 		getContentPane().add(textField);
 		textField.setColumns(10);
-		
-		
+
 		passwordField = new JPasswordField();
 		passwordField.setBounds(96, 58, 108, 20);
 		getContentPane().add(passwordField);
-		
+
 		JButton btnNewButton_1 = new JButton("Anmelden");
 		btnNewButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) 
-			{
-				//Registrierungsrequest
+			// Button gedrückt
+			public void actionPerformed(ActionEvent e) {
+				// Registrierungsrequest
 				String username = textField.getText();
-				String p=new String(passwordField.getPassword());
-				
-				//Grundvorgaben der Felder
-				if(username.isEmpty()||p.isEmpty())
+				String p = new String(passwordField.getPassword());
+
+				// Grundvorgaben der Felder
+				if (username.isEmpty() || p.isEmpty())
 					System.out.println("Bitte die Felder ausfüllen");
-				else
-				{
-				if(username.length()>15||p.length()>15)
+				else {
+					if (username.length() > 15 || p.length() > 15)
 						System.out.println("Die maximale Eingabelänge ist 16 Zeichen");
 					else {
-						
-				//Passwort verschlüsseln
-				String generatedPassword = null;
-				try {
-					MessageDigest md = MessageDigest.getInstance("SHA-512");
-					md.reset();
-					byte[] rawBytes=p.getBytes(StandardCharsets.UTF_8);
-					byte[] bytes = md.digest(p.getBytes(StandardCharsets.UTF_8));
-					StringBuilder sb = new StringBuilder();
-					for(int i=0; i< bytes.length ;i++){
-						sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-					}
-					generatedPassword = sb.toString();
-				} catch (NoSuchAlgorithmException ex) {
-					ex.printStackTrace();
-				}
-						//Url zum Aufruf mit Eingaben befüllen
-						String Anfrage = "http://localhost:8080/login?username="+username+"&password="+generatedPassword;
+
+						// Passwort verschlüsseln
+						String generatedPassword = null;
+						try {
+							MessageDigest md = MessageDigest.getInstance("SHA-512");
+							md.reset();
+							byte[] rawBytes = p.getBytes(StandardCharsets.UTF_8);
+							byte[] bytes = md.digest(p.getBytes(StandardCharsets.UTF_8));
+							StringBuilder sb = new StringBuilder();
+							for (int i = 0; i < bytes.length; i++) {
+								sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+							}
+							generatedPassword = sb.toString();
+						} catch (NoSuchAlgorithmException ex) {
+							ex.printStackTrace();
+						}
+						// Url zum Aufruf mit Eingaben befüllen
+						String Anfrage = "http://localhost:8080/login?username=" + username + "&password="
+								+ generatedPassword;
 						URL url;
 						try {
-							//HTTPRequest Erstellung
-							
+							// HTTPRequest Erstellung
+
 							url = new URL(Anfrage);
 							HttpURLConnection con = (HttpURLConnection) url.openConnection();
 							con.setRequestMethod("GET");
-							//Abfrage der Rückgabe des Requests
-							try(BufferedReader br = new BufferedReader(
+							// Abfrage der Rückgabe des Requests
+							try (BufferedReader br = new BufferedReader(
 									new InputStreamReader(con.getInputStream(), "utf-8"))) {
 								StringBuilder response = new StringBuilder();
 								String responseLine = null;
 								while ((responseLine = br.readLine()) != null) {
 									response.append(responseLine.trim());
 								}
-								if(response.isEmpty()) System.out.println("Fehler bei der Antwort");
+								if (response.isEmpty())
+									System.out.println("Fehler bei der Antwort");
 								else {
-									if(response.toString().equals("true"))
-									{
-									System.out.println("Erfolgreich als: "+username+" angemeldet");
-									//Aufrufen Hauptmenü bzw. einloggen als user mit dem gegebenen usernamen
-									MainMenu mm = new MainMenu(username);
-									mm.setVisible(true);
-									}
-									else System.out.println("Falscher Benutzername oder falsches Passwort");
+									if (response.toString().equals("true")) {
+										System.out.println("Erfolgreich als: " + username + " angemeldet");
+										// Aufrufen Hauptmenü bzw. einloggen als user mit dem gegebenen usernamen
+										MainMenu mm = new MainMenu(username);
+										mm.setVisible(true);
+									} else
+										System.out.println("Falscher Benutzername oder falsches Passwort");
 								}
 								con.disconnect();
 							} catch (UnsupportedEncodingException e1) {
-								
+
 								e1.printStackTrace();
 							} catch (IOException e1) {
-								
+
 								System.out.println("Fehler bei HTTP Request Spring Boot Server muss gestartet sein");
 							}
-							}
-							
-						 catch (IOException e1)  {
-							
-							//e1.printStackTrace();
 						}
-						
-					}	
+
+						catch (IOException e1) {
+
+							// e1.printStackTrace();
+						}
+
+					}
 				}
 			}
 		});
 		btnNewButton_1.setBounds(6, 80, 80, 23);
 		getContentPane().add(btnNewButton_1);
-		
+
 		JLabel lblNewLabel_3 = new JLabel("<html><u>Noch keinen Account?</u></<html>");
-		lblNewLabel_3.addMouseListener(new MouseAdapter() {
+		lblNewLabel_3.addMouseListener(new MouseAdapter()
+		// Button gedrückt
+		{
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Register r= new Register();
+				// Öffnen des Registrieren Windows
+				Register r = new Register();
 				r.setVisible(true);
-				
+
 			}
 		});
 		lblNewLabel_3.setBounds(91, 84, 128, 14);
 		getContentPane().add(lblNewLabel_3);
 	}
-	
-	
-	
-	
 
 	public static void main(String[] args) {
-		//Grundeigenschaften des Login Windows setzen
-		MainGui gui=new MainGui();
+		// Grundeigenschaften des Login Windows setzen
+		MainGui gui = new MainGui();
 		gui.setVisible(true);
 		gui.pack();
 		gui.setResizable(false);
-		gui.setSize(240,150);
+		gui.setSize(240, 150);
 		gui.setLocationRelativeTo(null);
 	}
 }
