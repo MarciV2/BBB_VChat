@@ -72,10 +72,10 @@ public class IncomingCallPopup extends JFrame {
 		this.setIconImage(icon.getImage());
 		
 		//Label zur Überschrift bestimmen und anzeigen
-		String überschrift;
-		if(username.equals(organizername))überschrift ="Angemeldet als: "+username+" eigenem Anruf beitreten?";
-		else überschrift ="Eingehender Anruf an: "+username+" von: " +organizername;
-		JLabel lblNewLabel = new JLabel(überschrift);
+		String headline;
+		if(username.equals(organizername))headline ="Angemeldet als: "+username+" eigenem Anruf beitreten?";
+		else headline ="Eingehender Anruf an: "+username+" von: " +organizername;
+		JLabel lblNewLabel = new JLabel(headline);
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblNewLabel.setBounds(10, 0, 420, 30);
 		getContentPane().add(lblNewLabel);
