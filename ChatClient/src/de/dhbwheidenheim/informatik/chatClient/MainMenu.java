@@ -134,7 +134,10 @@ public class MainMenu extends JFrame {
 
 				//Eigntliche Anrufsfunktion
 				String callType=chckbxNewCheckBox.isSelected()?"private":"public";
-				System.out.println("Anruf erstellt?: "+createCall(selectedusernames, callType));
+				String rückgabe = createCall(selectedusernames, callType);
+				if(rückgabe.isEmpty())System.out.println("Keine freien Räume vorhanden");
+				else
+				System.out.println("Anruf erstellt?: "+rückgabe);
 				
 				//eigenes Popup für neuen anruf öffnen
 				amICalled();
