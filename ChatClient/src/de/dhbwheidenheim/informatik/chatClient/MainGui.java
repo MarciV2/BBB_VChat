@@ -21,7 +21,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.LogManager;
+import javax.swing.SwingConstants;
 
 public class MainGui extends JFrame {
 	private JTextField textField;
@@ -40,20 +40,22 @@ public class MainGui extends JFrame {
 		getContentPane().add(lblNewLabel);
 		getContentPane().setLayout(null);
 		JLabel lblNewLabel_1 = new JLabel("Benutzername:");
-		lblNewLabel_1.setBounds(10, 36, 76, 14);
+		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_1.setBounds(10, 36, 100, 14);
 		getContentPane().add(lblNewLabel_1);
 
 		JLabel lblNewLabel_2 = new JLabel("Passwort:");
-		lblNewLabel_2.setBounds(10, 61, 58, 14);
+		lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_2.setBounds(10, 61, 100, 14);
 		getContentPane().add(lblNewLabel_2);
 
 		textField = new JTextField();
-		textField.setBounds(96, 33, 108, 20);
+		textField.setBounds(116, 33, 125, 20);
 		getContentPane().add(textField);
 		textField.setColumns(10);
 
 		passwordField = new JPasswordField();
-		passwordField.setBounds(96, 58, 108, 20);
+		passwordField.setBounds(116, 58, 125, 20);
 		getContentPane().add(passwordField);
 
 		JButton btnNewButton_1 = new JButton("Anmelden");
@@ -135,10 +137,11 @@ public class MainGui extends JFrame {
 				}
 			}
 		});
-		btnNewButton_1.setBounds(6, 80, 80, 23);
+		btnNewButton_1.setBounds(6, 80, 100, 23);
 		getContentPane().add(btnNewButton_1);
 
 		JLabel lblNewLabel_3 = new JLabel("<html><u>Noch keinen Account?</u></<html>");
+		lblNewLabel_3.setFont(new Font("Tahoma", Font.BOLD, 11));
 		lblNewLabel_3.addMouseListener(new MouseAdapter()
 		// Button gedrückt
 		{
@@ -150,7 +153,7 @@ public class MainGui extends JFrame {
 
 			}
 		});
-		lblNewLabel_3.setBounds(91, 84, 128, 14);
+		lblNewLabel_3.setBounds(116, 84, 186, 14);
 		getContentPane().add(lblNewLabel_3);
 	}
 
@@ -158,9 +161,9 @@ public class MainGui extends JFrame {
 		// Grundeigenschaften des Login Windows setzen
 		MainGui gui = new MainGui();
 		gui.setVisible(true);
-		gui.pack();
+//		gui.pack();
 		gui.setResizable(false);
-		gui.setSize(240, 150);
+		gui.setSize(270, 150);
 		gui.setLocationRelativeTo(null);
 	}
 }
