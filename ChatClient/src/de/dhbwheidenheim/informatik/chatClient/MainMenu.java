@@ -135,6 +135,10 @@ public class MainMenu extends JFrame {
 				//Eigntliche Anrufsfunktion
 				String callType=chckbxNewCheckBox.isSelected()?"private":"public";
 				System.out.println("Anruf erstellt?: "+createCall(selectedusernames, callType));
+				
+				//eigenes Popup für neuen anruf öffnen
+				amICalled();
+				
 
 
 			}
@@ -228,6 +232,8 @@ public class MainMenu extends JFrame {
 		panel.add(btnNewButton_2);
 		
 		//Möglichkeit für öffentliche Anrufe
+		//Funktionalität für öffentliche Anrufe wurde durchdacht, bei mehr Zeit wäre dies auch umgesetzt worden.
+		//Prinzip ist, dass man einen Anruf startet, dem dann alle beliebige Nutzer beitreten können. Dieser würde im Tree unter den Personen angezeigt, Bei Anclicken würde der "Anrufen" button zu "beitreten geändert.
 		chckbxNewCheckBox = new JCheckBox("Privater Anruf");
 		chckbxNewCheckBox.setSelected(true);
 		chckbxNewCheckBox.setBounds(272, 27, 137, 23);
@@ -469,6 +475,8 @@ public class MainMenu extends JFrame {
 					//System.out.println("AmiCalled-Antwort: " + response.toString());
 					// Nur popup anzeigen, wenn noch nicht angezeigt
 					if (incomingCallPopup == null || !incomingCallPopup.isVisible()) {
+						
+						//Details von Anruf extrahieren
 						JSONObject call = new JSONObject(response.toString());
 						JSONObject room = call.getJSONObject("chatRoom");
 						URI roomURI = new URI(room.getString("roomURL"));
@@ -483,7 +491,6 @@ public class MainMenu extends JFrame {
 							JSONObject o = new JSONObject(String.valueOf(s));
 							attendees.add(o.getString("username"));
 						}
-						//TODO überprüfen ob id so bestimmt werden kann
 						String id=String.valueOf(call.getInt("id"));
 						String organizer = call.getJSONObject("organizer").getString("username");
 						//						invitees.remove(organizer);

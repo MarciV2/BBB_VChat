@@ -13,6 +13,9 @@ public class VideoCall implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private int id;
 	private ChatRoom chatRoom;
+	
+	//Funktionalität für öffentliche Anrufe wurde durchdacht, bei mehr Zeit wäre dies auch umgesetzt worden.
+	//Prinzip ist, dass man einen Anruf startet, dem dann alle beliebige Nutzer beitreten können. Dieser würde im Tree unter den Personen angezeigt, Bei Anclicken würde der "Anrufen" button zu "beitreten geändert.
 	private boolean privateCall;
 	private CallState callState;
 	private Person organizer; 
