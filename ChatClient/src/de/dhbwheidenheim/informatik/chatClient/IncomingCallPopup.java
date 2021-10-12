@@ -30,10 +30,19 @@ import de.dhbwheidenheim.informatik.chatClient.PopupElements.CustomTreeNode;
 public class IncomingCallPopup extends JFrame {
 	private JScrollPane scrollPane;
 	public IncomingCallPopup(URI roomURL, String organizername ,boolean isPrivate, ArrayList<String> otherInvitees, ArrayList<String> attendees, String id, String username ) {
-		setTitle("Eingehender Anruf!");
-		setIconImage(Toolkit.getDefaultToolkit().getImage(IncomingCallPopup.class.getResource("/resources/acceptCall_small.png")));
-		IncomingCallPopup self=this;
+		//Icons laden
+		ImageIcon persons_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/persons_tiny.png"));		
+		ImageIcon person_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/person-icon_tiny.png"));	
+		ImageIcon details_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/details.png"));		
+		ImageIcon accept_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/acceptCall_small.png"));
+		ImageIcon decline_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/declineCall_small.png"));
+		ImageIcon plus_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/plus.png"));
+		ImageIcon minus_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/minus.png"));
 		
+		
+		setTitle("Eingehender Anruf!");
+		IncomingCallPopup self=this;
+
 		this.setSize(450,275);
 		this.setResizable(false);
 		this.setAlwaysOnTop(true);
@@ -43,6 +52,7 @@ public class IncomingCallPopup extends JFrame {
 		URL iconURL = getClass().getResource("/resources/BigBlueButton_icon.svg.png");
 		ImageIcon icon = new ImageIcon(iconURL);
 		this.setIconImage(icon.getImage());
+		
 		//Label zur Überschrift bestimmen und anzeigen
 		String überschrift;
 		if(username.equals(organizername))überschrift ="Angemeldet als: "+username+" eigenem Anruf beitreten?";
@@ -55,7 +65,7 @@ public class IncomingCallPopup extends JFrame {
 
 		JButton btnNewButton_1 = new JButton("");
 		btnNewButton_1.setLocation(330, 30);
-		btnNewButton_1.setIcon(new ImageIcon(IncomingCallPopup.class.getResource("/resources/declineCall_small.png")));
+		btnNewButton_1.setIcon(decline_icon);
 		btnNewButton_1.setToolTipText("ABLEHNEN");
 		btnNewButton_1.setSize(100,100);
 		btnNewButton_1.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
@@ -70,7 +80,7 @@ public class IncomingCallPopup extends JFrame {
 				URL url;
 				try { 
 					// HTTPRequest Erstellung
-					
+
 					url = new URL(Anfrage);
 					HttpURLConnection con = (HttpURLConnection) url.openConnection();
 					con.setRequestMethod("GET");
@@ -109,7 +119,7 @@ public class IncomingCallPopup extends JFrame {
 		JButton btnNewButton = new JButton("");
 		btnNewButton.setBounds(10, 30, 100, 100);
 		btnNewButton.setToolTipText("ANNEHMEN");
-		btnNewButton.setIcon(new ImageIcon(IncomingCallPopup.class.getResource("/resources/acceptCall_small.png")));
+		btnNewButton.setIcon(accept_icon);
 		btnNewButton.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
 		btnNewButton.setBorderPainted(false);
 		btnNewButton.setContentAreaFilled(false);
@@ -163,12 +173,6 @@ public class IncomingCallPopup extends JFrame {
 		getContentPane().add(btnNewButton);
 
 
-		//Icon einlesen für Custom Jtree
-		ImageIcon persons_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/persons_tiny.png"));		
-		ImageIcon person_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/person-icon_tiny.png"));	
-		ImageIcon plus_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/plus.png"));	
-		ImageIcon minus_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/minus.png"));
-		ImageIcon details_icon=new ImageIcon(IncomingCallPopup.class.getResource("/resources/details.png"));		
 
 
 
@@ -211,13 +215,13 @@ public class IncomingCallPopup extends JFrame {
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setBounds(120, 30, 200, 200);
 		getContentPane().add(scrollPane);
-		
+
 		getContentPane().add(btnNewButton_1);
 
 
 
 
-		
+
 	}
 }
 
