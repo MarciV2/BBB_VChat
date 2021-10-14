@@ -1,42 +1,25 @@
 package de.dhbwheidenheim.informatik.chatClient;
 
-import java.awt.BorderLayout;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.net.ConnectException;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTextPane;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.Console;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.awt.event.ActionEvent;
-import java.awt.Font;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
 import javax.swing.JPanel;
-import javax.swing.BoxLayout;
-import javax.swing.SwingConstants;
-import javax.swing.GroupLayout;
-import javax.swing.ImageIcon;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import java.awt.FlowLayout;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 public class Register extends JFrame {
 	private JTextField textField;
@@ -145,11 +128,12 @@ public class Register extends JFrame {
 												if (response.toString()
 														.equals("Fehler der Username ist bereits vergeben"))
 													System.out.println(response);
-												else
+												else {
 													System.out.println("Erfolgreich registriert, ihr Benutzername ist:"
 															+ response.toString());
-												// Bei erfolgreichem Registrieren Fenster schlieﬂen
-												self.setVisible(false);
+													// Bei erfolgreichem Registrieren Fenster schlieﬂen
+													self.setVisible(false);
+												}
 											}
 											con.disconnect();
 										} catch (UnsupportedEncodingException e1) {

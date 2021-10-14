@@ -1,20 +1,16 @@
 package de.dhbwheidenheim.informatik.chatClient;
 
-import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +23,7 @@ import java.util.TimerTask;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -42,7 +39,6 @@ import org.json.JSONObject;
 
 import de.dhbwheidenheim.informatik.chatClient.PopupElements.CustomTreeCellRenderer;
 import de.dhbwheidenheim.informatik.chatClient.PopupElements.CustomTreeNode;
-import javax.swing.JCheckBox;
 
 public class MainMenu extends JFrame {
 	private JTextField textField;
@@ -51,8 +47,9 @@ public class MainMenu extends JFrame {
 	private JTree tree;
 	private CustomTreeNode top;
 	private JCheckBox chckbxNewCheckBox;
-	//	 private JTree tree = new JTree();
+	// private JTree tree = new JTree();
 	private JScrollPane scrollPane;
+
 	public MainMenu(String username) {
 		// Speichern des eigenen usernames
 		this.username = username;
@@ -80,7 +77,7 @@ public class MainMenu extends JFrame {
 
 						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 					statusÄndern("OFFLINE");
-					//self.setVisible(false);
+
 				}
 			}
 		});
@@ -104,45 +101,47 @@ public class MainMenu extends JFrame {
 
 		JButton btnNewButton = new JButton("Ausgew\u00E4hlte Nutzer anrufen");
 		btnNewButton.addActionListener(new ActionListener() {
-			//Button gedrückt
+			// Button gedrückt
 			public void actionPerformed(ActionEvent e) {
-				ArrayList<String> selectedusernames=new ArrayList<String>();
-				//Vorgabe welche Nodes verboten sind
-				String[] forbiddenNames= {"Benutzer","Online","Offline","Nicht Stören","Beschäftigt","Kein anderer User Registriert","Gesamt"};
-				for(javax.swing.tree.TreePath tp:tree.getSelectionPaths()) {
+				ArrayList<String> selectedusernames = new ArrayList<String>();
+				// Vorgabe welche Nodes verboten sind
+				String[] forbiddenNames = { "Benutzer", "Online", "Offline", "Nicht Stören", "Beschäftigt",
+						"Kein anderer User Registriert", "Gesamt" };
+				for (javax.swing.tree.TreePath tp : tree.getSelectionPaths()) {
 
-					//Prüfen, dass nicht default-Nodes sondern wirklich ein Benutzer ausgewählt wurde
-					String selectedusername=tp.getLastPathComponent().toString().split(" ")[0];
-					if(!Arrays.asList(forbiddenNames).contains(selectedusername)) {
+					// Prüfen, dass nicht default-Nodes sondern wirklich ein Benutzer ausgewählt
+					// wurde
+					String selectedusername = tp.getLastPathComponent().toString().split(" ")[0];
+					if (!Arrays.asList(forbiddenNames).contains(selectedusername)) {
 
-						//Prüfen, dass Benutzer auch online ist
-						if(tp.getLastPathComponent().toString().split(" ")[1].equals("ONLINE")) {
-							System.out.println("Benutzer ausgewählt: " +selectedusername);
+						// Prüfen, dass Benutzer auch online ist
+						if (tp.getLastPathComponent().toString().split(" ")[1].equals("ONLINE")) {
+							System.out.println("Benutzer ausgewählt: " + selectedusername);
 							selectedusernames.add(selectedusername);
-						}else {
-							System.out.println("Benutzer "+selectedusername+" ist nicht Online und wird nicht eingeladen!");
+						} else {
+							System.out.println(
+									"Benutzer " + selectedusername + " ist nicht Online und wird nicht eingeladen!");
 						}
 					}
 
 				}
-				//Wurde ein gültiger Name ausgewählt
-				if(selectedusernames.size()==0) {
+				// Wurde ein gültiger Name ausgewählt
+				if (selectedusernames.size() == 0) {
 					System.out.println("Kein valider Benutzer ausgewählt->Abgebrochen!");
 					return;
 				}
-				System.out.println("Benutzer für neuen Anruf ausgewählt: "+selectedusernames);
+				System.out.println("Benutzer für neuen Anruf ausgewählt: " + selectedusernames);
 
-				//Eigntliche Anrufsfunktion
-				String callType=chckbxNewCheckBox.isSelected()?"private":"public";
+				// Eigntliche Anrufsfunktion
+				String callType = chckbxNewCheckBox.isSelected() ? "private" : "public";
 				String rückgabe = createCall(selectedusernames, callType);
-				if(rückgabe.isEmpty())System.out.println("Keine freien Räume vorhanden");
+				if (rückgabe.isEmpty())
+					System.out.println("Keine freien Räume vorhanden");
 				else
-				System.out.println("Anruf erstellt?: "+rückgabe);
-				
-				//eigenes Popup für neuen anruf öffnen
-				amICalled();
-				
+					System.out.println("Anruf erstellt?: " + rückgabe);
 
+				// eigenes Popup für neuen anruf öffnen
+				amICalled();
 
 			}
 		});
@@ -211,19 +210,16 @@ public class MainMenu extends JFrame {
 		gruppe.add(rdbtnNewRadioButton_2);
 		gruppe.add(rdbtnNewRadioButton_3);
 
-
-		//Scrollbar und tree initialisieren
-		top = new CustomTreeNode(new ImageIcon(
-				IncomingCallPopup.class.getResource("/resources/details.png"), "Benutzer"));
-		tree=new JTree(top);
+		// Scrollbar und tree initialisieren
+		top = new CustomTreeNode(
+				new ImageIcon(IncomingCallPopup.class.getResource("/resources/details.png"), "Benutzer"));
+		tree = new JTree(top);
 		scrollPane = new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setBounds(10, 31, 205, 184);
 		getContentPane().add(scrollPane);
 		// Tree renderer um Bilder darzustellen
 		tree.setCellRenderer(new CustomTreeCellRenderer());
-
-
 
 		JButton btnNewButton_2 = new JButton("Benutzerliste aktualisieren");
 		btnNewButton_2.addActionListener(new ActionListener() {
@@ -233,10 +229,13 @@ public class MainMenu extends JFrame {
 		});
 		btnNewButton_2.setBounds(0, 226, 215, 23);
 		panel.add(btnNewButton_2);
-		
-		//Möglichkeit für öffentliche Anrufe
-		//Funktionalität für öffentliche Anrufe wurde durchdacht, bei mehr Zeit wäre dies auch umgesetzt worden.
-		//Prinzip ist, dass man einen Anruf startet, dem dann alle beliebige Nutzer beitreten können. Dieser würde im Tree unter den Personen angezeigt, Bei Anclicken würde der "Anrufen" button zu "beitreten geändert.
+
+		// Möglichkeit für öffentliche Anrufe
+		// Funktionalität für öffentliche Anrufe wurde durchdacht, bei mehr Zeit wäre
+		// dies auch umgesetzt worden.
+		// Prinzip ist, dass man einen Anruf startet, dem dann alle beliebige Nutzer
+		// beitreten können. Dieser würde im Tree unter den Personen angezeigt, Bei
+		// Anclicken würde der "Anrufen" button zu "beitreten geändert.
 		chckbxNewCheckBox = new JCheckBox("Privater Anruf");
 		chckbxNewCheckBox.setSelected(true);
 		chckbxNewCheckBox.setBounds(272, 27, 137, 23);
@@ -250,13 +249,12 @@ public class MainMenu extends JFrame {
 					// Benutzerliste wird aktualisiert
 					treeSchreiben();
 
-
 				}
 			}
 		}, 100, // Erster Aufruf nach 100ms
 				30000); // Alle 30 Sekunden danach
 
-		//Timer für Anruf-Prüfung erstellen
+		// Timer für Anruf-Prüfung erstellen
 		Timer t2 = new Timer();
 		t2.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
@@ -266,7 +264,6 @@ public class MainMenu extends JFrame {
 			}
 		}, 100, // Erster Aufruf nach 100ms
 				10000); // Alle 10 Sekunden danach
-
 
 	}
 
@@ -306,8 +303,8 @@ public class MainMenu extends JFrame {
 					ImageIcon details_icon = new ImageIcon(
 							IncomingCallPopup.class.getResource("/resources/details.png"));
 					// Erstellen der Nodes
-					top=new CustomTreeNode(new ImageIcon(
-							IncomingCallPopup.class.getResource("/resources/details.png"), "Benutzer"));
+					top = new CustomTreeNode(
+							new ImageIcon(IncomingCallPopup.class.getResource("/resources/details.png"), "Benutzer"));
 					CustomTreeNode onlineNode = new CustomTreeNode(persons_icon, "Online");
 					CustomTreeNode busyNode = new CustomTreeNode(persons_icon, "Beschäftigt");
 					CustomTreeNode dontdisturbNode = new CustomTreeNode(persons_icon, "Nicht stören");
@@ -377,14 +374,13 @@ public class MainMenu extends JFrame {
 					}
 
 					// Tree erstellen
-					
+
 					((DefaultTreeModel) tree.getModel()).setRoot(top);
 
 					// Tree aufklappen
 					for (int i = 0; i < tree.getRowCount(); i++) {
 						tree.expandRow(i);
 					}
-
 
 					System.out.println("Benutzerliste für:" + username + " wurde aktualisiert");
 
@@ -454,13 +450,15 @@ public class MainMenu extends JFrame {
 			// e1.printStackTrace();
 		}
 	}
-/**
- * Funktion frägt mittels Polling ab ob ein Anruf existiert in den der User eingeladen wurde
- */
+
+	/**
+	 * Funktion frägt mittels Polling ab ob ein Anruf existiert in den der User
+	 * eingeladen wurde
+	 */
 	void amICalled() {
-		
+
 		String Anfrage = "http://localhost:8080/amICalled?username=" + username;
-		
+
 		URL url;
 		try {
 			url = new URL(Anfrage);
@@ -473,13 +471,13 @@ public class MainMenu extends JFrame {
 					response.append(responseLine.trim());
 				}
 				if (response.isEmpty())
-					System.out.println("kein eingehender Anruf für Benutzer "+username);
+					System.out.println("kein eingehender Anruf für Benutzer " + username);
 				else {
-					//System.out.println("AmiCalled-Antwort: " + response.toString());
+					// System.out.println("AmiCalled-Antwort: " + response.toString());
 					// Nur popup anzeigen, wenn noch nicht angezeigt
 					if (incomingCallPopup == null || !incomingCallPopup.isVisible()) {
-						
-						//Details von Anruf extrahieren
+
+						// Details von Anruf extrahieren
 						JSONObject call = new JSONObject(response.toString());
 						JSONObject room = call.getJSONObject("chatRoom");
 						URI roomURI = new URI(room.getString("roomURL"));
@@ -494,11 +492,12 @@ public class MainMenu extends JFrame {
 							JSONObject o = new JSONObject(String.valueOf(s));
 							attendees.add(o.getString("username"));
 						}
-						String id=String.valueOf(call.getInt("id"));
+						String id = String.valueOf(call.getInt("id"));
 						String organizer = call.getJSONObject("organizer").getString("username");
-						//						invitees.remove(organizer);
-						//						invitees.remove(username);
-						incomingCallPopup = new IncomingCallPopup(roomURI, organizer, isPrivate, invitees, attendees,id,username);
+						// invitees.remove(organizer);
+						// invitees.remove(username);
+						incomingCallPopup = new IncomingCallPopup(roomURI, organizer, isPrivate, invitees, attendees,
+								id, username);
 					}
 					incomingCallPopup.setVisible(true);
 				}
@@ -511,26 +510,28 @@ public class MainMenu extends JFrame {
 		}
 	}
 
-/**
- * Funktion erstellt einen Anruf anhand der übergebenen Liste
- * @param users Liste mit den anzurufenden Teilnehmer
- * @param callType gibt an ob Anruf privat/öffentlich ist
- * @return
- */
+	/**
+	 * Funktion erstellt einen Anruf anhand der übergebenen Liste
+	 * 
+	 * @param users    Liste mit den anzurufenden Teilnehmer
+	 * @param callType gibt an ob Anruf privat/öffentlich ist
+	 * @return
+	 */
 	private String createCall(ArrayList<String> users, String callType) {
 
 		Map<String, String> parameters = new HashMap<>();
 		parameters.put("organizername", username);
 		parameters.put("callType", callType);
 
-		//Einzuladende umformatieren und anhängen
-		String inviteesStr="";
-		for(String s:users) inviteesStr+=s+",";
-		inviteesStr=inviteesStr.substring(0, inviteesStr.length()-1);
+		// Einzuladende umformatieren und anhängen
+		String inviteesStr = "";
+		for (String s : users)
+			inviteesStr += s + ",";
+		inviteesStr = inviteesStr.substring(0, inviteesStr.length() - 1);
 		parameters.put("invitees", inviteesStr);
 
 		try {
-			//Aufruf HTTPRequest Methode und die Antwort dieser wird zurückgegben
+			// Aufruf HTTPRequest Methode und die Antwort dieser wird zurückgegben
 			return doHttpRequest("newCall", parameters);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -539,22 +540,22 @@ public class MainMenu extends JFrame {
 
 	}
 
-/**
- * Funktion um HTTPRequest für Amruf zu starten
- * @param reqMethod
- * @param params
- * @return
- * @throws IOException
- */
-	public String doHttpRequest(String reqMethod, Map<String,String>params) throws IOException {
-		//Aufruf Url Erstellung
-		URL url = new URL("http://localhost:8080/"+reqMethod+"?"+ParameterStringBuilder.getParamsString(params));
+	/**
+	 * Funktion um HTTPRequest für Amruf zu starten
+	 * 
+	 * @param reqMethod
+	 * @param params
+	 * @return
+	 * @throws IOException
+	 */
+	public String doHttpRequest(String reqMethod, Map<String, String> params) throws IOException {
+		// Aufruf Url Erstellung
+		URL url = new URL("http://localhost:8080/" + reqMethod + "?" + ParameterStringBuilder.getParamsString(params));
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("GET");
 
-		//Antwort lesen
-		BufferedReader in = new BufferedReader(
-				new InputStreamReader(con.getInputStream()));
+		// Antwort lesen
+		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String inputLine;
 		StringBuffer content = new StringBuffer();
 		while ((inputLine = in.readLine()) != null) {
@@ -563,7 +564,7 @@ public class MainMenu extends JFrame {
 		in.close();
 		con.disconnect();
 
-		//Gibt Antwort zurück an createCall Funktion
+		// Gibt Antwort zurück an createCall Funktion
 		return content.toString();
 	}
 
