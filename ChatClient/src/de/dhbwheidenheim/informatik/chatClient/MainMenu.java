@@ -330,7 +330,7 @@ public class MainMenu extends JFrame {
 					l.sort(null);
 
 					// Liste leer?
-					if (!l.get(0).equals(null)) {
+					if (l.size()>0) {
 						// Für alle Listenelemente einmal abfragen
 						for (int i = 0; i < l.size(); i++) {
 							s = l.get(i).toString();
