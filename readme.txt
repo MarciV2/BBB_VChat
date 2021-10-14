@@ -7,9 +7,9 @@ Kurze Anleitung zum starten BBB_VChats von Marcel Vidmar und Johannes Fahr:
 5.  Username und Passwort eingeben und auf registrieren klicken.
 6.  Nun kann sich Mittels username und Passwort im MainGui angemeldet werden.
 7.  Bei erfolgreichen anmelden öffnet sich das MainMenu von diesem können Anrufe getätigt und empfangen werden, außerdem werden Benutzer und deren Status angezeigt und der eigene Status kann gesetzt werden.
-8.  Um andere User anrfen zu können sollten diese Online sein und innerhalb des Jtrees ausgewählt sein. Danach einfach auf den Button "Ausgewälte Nutzer anrufen" drücken.
-9.  Ist man selber einem Anruf zugeteilt so öffnet sich das IncominCallPopup, dieses zeigt Teilnehmer, Eingeladene und Organisator an. Bei drücken auf annehmen wird einer der freien Räume geöffnet.
-10. Wenn der BBB Raum verlassen wird sollte der Button gedrückt oder das Fenster des PopupLeaveCall geschlossen werden. Aufgrund der Limitierungen des Servers muss mitgeteilt werden wer den Anruf verlassen hat.
+8.  Um andere User anrfen zu können sollten diese Online sein und innerhalb des Jtrees ausgewählt(Mehrere User möglich) sein. Danach einfach auf den Button "Ausgewälte Nutzer anrufen" drücken.
+9.  Ist man selber einem Anruf zugeteilt so öffnet sich das IncominCallPopup, dieses zeigt Teilnehmer, Eingeladene und Organisator an. Bei drücken auf annehmen wird der dem Anruf zugeteilten Raum geöffnet.
+10. Wenn der BBB Raum verlassen wird sollte der Button gedrückt oder das Fenster des PopupLeaveCall geschlossen werden. Aufgrund der Limitierungen des Servers muss manuell mitgeteilt werden wer den Anruf verlassen hat.
 
 ________________________________________________________________________________________________________________________
 
