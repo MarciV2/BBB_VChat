@@ -6,41 +6,44 @@ import java.util.List;
 
 import de.dhbwheidenheim.informatik.chatServer.model.enums.CallState;
 import de.dhbwheidenheim.informatik.chatServer.model.enums.RoomState;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 
-public class VideoCall implements Serializable{
+public class VideoCall implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private int id;
 	private ChatRoom chatRoom;
-	
-	//Funktionalität für öffentliche Anrufe wurde durchdacht, bei mehr Zeit wäre dies auch umgesetzt worden.
-	//Prinzip ist, dass man einen Anruf startet, dem dann alle beliebige Nutzer beitreten können. Dieser würde im Tree unter den Personen angezeigt, Bei Anclicken würde der "Anrufen" button zu "beitreten geändert.
+
+	// Funktionalität für öffentliche Anrufe wurde durchdacht, bei mehr Zeit wäre
+	// dies auch umgesetzt worden.
+	// Prinzip ist, dass man einen Anruf startet, dem dann alle beliebige Nutzer
+	// beitreten können. Dieser würde im Tree unter den Personen angezeigt, Bei
+	// Anclicken würde der "Anrufen" button zu "beitreten geändert.
 	private boolean privateCall;
 	private CallState callState;
-	private Person organizer; 
+	private Person organizer;
 	private List<Person> invitees;
 	private List<Person> attendees;
 
-
-	public VideoCall(int id,Person organizer, ChatRoom chatRoom ,boolean privateCall) {
-		this.id=id;
-		this.organizer=organizer;
-		this.chatRoom=chatRoom;
-		this.privateCall=privateCall;
-		this.callState=CallState.IN_PROGRESS;
-		invitees=new ArrayList<Person>();
+	public VideoCall(int id, Person organizer, ChatRoom chatRoom, boolean privateCall) {
+		this.id = id;
+		this.organizer = organizer;
+		this.chatRoom = chatRoom;
+		this.privateCall = privateCall;
+		this.callState = CallState.IN_PROGRESS;
+		invitees = new ArrayList<Person>();
 		invitees.add(organizer);
-		attendees=new ArrayList<Person>();
+		attendees = new ArrayList<Person>();
 	}
+
 	@Override
 	public String toString() {
 		System.out.println("toString");
 		return null;
 	}
+
 	public int getId() {
 		return id;
 	}
+
 	public Person getOrganizer() {
 		return organizer;
 	}
@@ -66,27 +69,27 @@ public class VideoCall implements Serializable{
 	}
 
 	public void setCallState(CallState state) {
-		this.callState=state;
+		this.callState = state;
 	}
-
 
 	/**
 	 * Lädt einzelne Person dem Anruf ein
+	 * 
 	 * @param invitee
 	 */
 	public boolean invitePerson(Person invitee) {
-		if(callState==CallState.OVER) return false;
+		if (callState == CallState.OVER)
+			return false;
 		invitees.add(invitee);
 		return true;
 	}
 
-
 	public boolean personJoins(Person joiner) {
-		if(callState!=CallState.OVER) {
-			//Bei BEENDET sollen keine Personen mehr beitreten können
-			if(privateCall) {
-				if(!invitees.contains(joiner)) {
-					//Bei PRIVAT sollen nicht eingeladene Personen nicht beitreten können
+		if (callState != CallState.OVER) {
+			// Bei BEENDET sollen keine Personen mehr beitreten können
+			if (privateCall) {
+				if (!invitees.contains(joiner)) {
+					// Bei PRIVAT sollen nicht eingeladene Personen nicht beitreten können
 					return false;
 				}
 			}
@@ -94,22 +97,23 @@ public class VideoCall implements Serializable{
 			attendees.add(joiner);
 			return true;
 
-		}else return false;
+		} else
+			return false;
 	}
 
-
 	/**
-	 * Event, wenn Person den Raum verlässt. Wenn letzte Person geht, wird der Anruf beendet und der Raum wieder freigegeben
+	 * Event, wenn Person den Raum verlässt. Wenn letzte Person geht, wird der Anruf
+	 * beendet und der Raum wieder freigegeben
+	 * 
 	 * @param leaver verlassende Person
 	 */
 	public void personLeaves(Person leaver) {
 		invitees.remove(leaver);
 		attendees.remove(leaver);
-		if(attendees.size()==0) {
-			callState=CallState.OVER;
+		if (attendees.size() == 0) {
+			callState = CallState.OVER;
 			chatRoom.setState(RoomState.FREE);
 		}
 	}
-
 
 }
